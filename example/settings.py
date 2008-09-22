@@ -78,4 +78,5 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'django_vcs_watch',
+    'django_extensions',
 )
