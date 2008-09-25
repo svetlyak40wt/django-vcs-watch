@@ -1,0 +1,30 @@
+{% load syntax_color %}
+{% load i18n %}
+<html>
+    <head>
+        <style>
+        {% pygments_css %}
+        ul.revisions li {border-top: 2px solid black; list-style: none;}
+        span.rev, span.date, span.author {float: left; right-padding: 2em; margin-right:1em;}
+        p.message {clear: left; margin-top: 2em; background-color: lightgray;}
+        .highlight {overflow: hidden;}
+        </style>
+        <title>{% trans 'Last changes from' %} {{object.url}}</title>
+    </head>
+    <body>
+        <h1>{% trans 'Last changes from' %} {{object.url}}</h1>
+        <ul class="revisions">
+        {% for diff in object.revision_set.all %}
+            <li>
+            <span class="rev">{% trans 'Revision' %}:&nbsp;{{diff.rev}}</span>
+            <span class="date">{% trans 'Date' %}:&nbsp;{{diff.date}}</span>
+            <span class="author">{% trans 'Author' %}:&nbsp;{{diff.author}}</span>
+            <p class="message">{{diff.message}}</p>
+
+            {{diff.diff|colorize:"diff"}}
+            </li>
+        {% endfor %}
+        </ul>
+    </body>
+</html>
+
