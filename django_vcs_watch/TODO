@@ -1,0 +1,14 @@
+TODO
+====
+
+* Add creation time to Repository model.
+* Use reverse lookup.
+* Add page to view list of public repository feeds.
+* Add page to view one revision in the repository.
+* Add automatic link to feed's creator.
+    Here is some work arounds, which allow access to the current user without Request:
+
+    http://code.djangoproject.com/wiki/CookBookThreadlocalsAndUser
+    http://code.djangoproject.com/wiki/CookBookNewformsAdminAndUser
+* Add page to view user's repository feeds.
+* Add page to create new repository outside from admin interface.
