@@ -9,6 +9,7 @@ from xml.etree import ElementTree as ET
 
 from django.db import models
 from django.conf import settings
+from django.contrib.auth.models import User
 
 _REVISION_LIMIT = getattr(settings, 'VCS_REVISION_LIMIT', 20)
 
@@ -16,10 +17,12 @@ def strip_timezone(t):
     return datetime(t.year, t.month, t.day, t.hour, t.minute, t.second, t.microsecond)
 
 class Repository(models.Model):
+    user = models.ForeignKey(User, editable=False, null=True)
     hash = models.CharField(name='Hash', editable=False, max_length=36)
     url = models.URLField(name='URL', verify_exists=False)
     last_rev = models.CharField(name='Last revision', editable=False, max_length=32)
     last_access = models.DateTimeField(name='Date', editable=False, null=True)
+    public = models.BooleanField(name='Public', default=True)
 
     class Meta:
         verbose_name = 'Repository'
