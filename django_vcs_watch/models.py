@@ -36,6 +36,12 @@ class Repository(models.Model):
         verbose_name = 'Repository'
         verbose_name_plural = 'Repositories'
 
+    def __unicode__(self):
+        return 'Repository at %s' % self.url
+
+    def get_absolute_url(self):
+        return '/vcs/%s/' % self.hash
+
     def save(self):
         if self.id is None:
             self.hash = unicode(uuid.uuid4())
@@ -124,6 +130,12 @@ class Revision(models.Model):
     date = models.DateTimeField(name='Date')
     message = models.TextField(name='Message')
     diff = models.TextField(name='Diff')
+
+    def __unicode__(self):
+        return 'Revision %s' % self.rev
+
+    def get_absolute_url(self):
+        return '/vcs/%s/%s/' % (self.repos.hash, self.rev)
 
     class Meta:
         ordering = ('-date',)
