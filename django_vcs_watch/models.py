@@ -18,11 +18,19 @@ def strip_timezone(t):
 
 class Repository(models.Model):
     user = models.ForeignKey(User, editable=False, null=True)
-    hash = models.CharField(name='Hash', editable=False, max_length=36)
-    url = models.URLField(name='URL', verify_exists=False)
-    last_rev = models.CharField(name='Last revision', editable=False, max_length=32)
-    last_access = models.DateTimeField(name='Date', editable=False, null=True)
-    public = models.BooleanField(name='Public', default=True)
+    hash = models.CharField('Hash', editable=False, max_length=36)
+    url = models.URLField('URL', verify_exists=False)
+    last_rev = models.CharField('Last revision', editable=False, max_length=32)
+    last_access = models.DateTimeField('Date', editable=False, null=True)
+    public = models.BooleanField(
+            'Public',
+            default=True,
+            help_text='Repositories which require authentication, can\'t be public.')
+    username = models.CharField(
+            'Username', max_length=40, blank=True,
+            help_text='Leave empty for anonymous access.')
+    password = models.CharField(
+            'Password', max_length=40, blank=True)
 
     class Meta:
         verbose_name = 'Repository'
@@ -31,25 +39,35 @@ class Repository(models.Model):
     def save(self):
         if self.id is None:
             self.hash = unicode(uuid.uuid4())
+
+        if self.username and self.password:
+            self.public = False
+
         return super(Repository, self).save()
 
     def updateFeed(self):
         log = open('/tmp/log.txt', 'a')
         log.write('update %s\n' % self.hash)
 
-        limit = rev = ''
+        options = {
+            'url': self.url,
+            'rev':'', 'limit':'', 'username':'', 'password':''
+        }
 
         if self.last_rev:
-            rev = ' -r HEAD:%s ' % self.last_rev
+            options['rev'] = ' -r HEAD:%s ' % self.last_rev
 
         if _REVISION_LIMIT:
-            limit = ' --limit %s ' % _REVISION_LIMIT
+            options['limit'] = ' --limit %s ' % _REVISION_LIMIT
 
-        command = 'svn log %(limit)s %(rev)s --xml %(url)s' % {
-                'rev': rev,
-                'limit': limit,
-                'url': self.url
-                }
+        if self.username:
+            options['username'] = ' --username \'%s\' ' % self.username
+
+        if self.password:
+            options['password'] = ' --password \'%s\' ' % self.password
+
+        command = 'svn log %(limit)s%(rev)s%(username)s%(password)s --xml %(url)s' % options
+
         print command
         in_, out_ = os.popen2(command)
 
