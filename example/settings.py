@@ -64,6 +64,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django_globals.middleware.User',
 )
 
 ROOT_URLCONF = 'vcs_watch.urls'
@@ -80,5 +81,6 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django_vcs_watch',
     'django_extensions',
+    'django_globals',
 )
 
