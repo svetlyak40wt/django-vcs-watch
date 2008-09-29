@@ -131,10 +131,11 @@ class Repository(models.Model):
             diff.save()
             self.last_rev = diff.rev
 
+        if len(diffs) > 0:
+            self.save()
+
         for old_revision in self.revision_set.all()[_REVISION_LIMIT:]:
             old_revision.delete()
-
-        self.save()
 
 
 class Revision(models.Model):
