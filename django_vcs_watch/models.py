@@ -15,6 +15,11 @@ from django.contrib.auth.models import User
 
 _REVISION_LIMIT = getattr(settings, 'VCS_REVISION_LIMIT', 20)
 
+if 'django_globals' not in settings.INSTALLED_APPS:
+    raise Exception('Please, install django_globals application.')
+
+if 'django_globals.middleware.User' not in settings.MIDDLEWARE_CLASSES:
+    raise Exception('Please, add django_globals.middleware.User to the MIDDLEWARE_CLASSES.')
 
 def strip_timezone(t):
     return datetime(t.year, t.month, t.day, t.hour, t.minute, t.second, t.microsecond)
@@ -62,6 +67,9 @@ class Repository(models.Model):
 
         if self.username and self.password:
             self.public = False
+
+        from django_globals import globals
+        self.user = globals.user
 
         return super(Repository, self).save()
 
