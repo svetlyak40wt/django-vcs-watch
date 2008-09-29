@@ -42,6 +42,10 @@ class Repository(models.Model):
     def get_absolute_url(self):
         return '/vcs/%s/' % self.hash
 
+    @models.permalink
+    def get_rss_url(self):
+        return ('vcs-watch-feeds', (), {'url': 'diffs/%s' % self.hash })
+
     def save(self):
         if self.id is None:
             self.hash = unicode(uuid.uuid4())
