@@ -68,7 +68,7 @@ class Repository(models.Model):
     def updateFeed(self):
         logger = logging.getLogger('django_vcs_view.repository.updateFeed')
 
-        logger.debug('update %s\n' % self.hash)
+        logger.debug('update %s' % self.hash)
 
         options = {
             'url': self.url,
