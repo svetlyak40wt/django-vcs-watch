@@ -3,6 +3,7 @@ import uuid
 import logging
 import re
 
+from pdb import set_trace
 from datetime import datetime
 from dateutil.parser import parse as parse_date
 from dateutil.tz import tzutc
@@ -65,11 +66,11 @@ class Repository(models.Model):
             self.hash = unicode(uuid.uuid4())
             self.created_at = self.updated_at
 
+            from django_globals import globals
+            self.user = globals.user
+
         if self.username and self.password:
             self.public = False
-
-        from django_globals import globals
-        self.user = globals.user
 
         return super(Repository, self).save()
 
