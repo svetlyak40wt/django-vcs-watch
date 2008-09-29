@@ -54,7 +54,7 @@ class Repository(models.Model):
         return ('vcs-watch-feeds', (), {'url': 'diffs/%s' % self.hash })
 
     def save(self):
-        seld.updated_at = datetime.today()
+        self.updated_at = datetime.today()
 
         if not self.id:
             self.hash = unicode(uuid.uuid4())
