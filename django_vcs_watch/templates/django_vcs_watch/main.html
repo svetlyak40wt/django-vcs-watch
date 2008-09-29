@@ -6,7 +6,12 @@
     <ul>
     {% for repository in repositories %}
         <li>
-            <a href="{{repository.hash}}">{{repository.url}}</a>, {% trans 'revision' %} {{repository.last_rev}}
+            <a href="{{repository.hash}}">{{repository.url}}</a>
+            {% if repository.last_rev %}
+                {% trans 'updated at' %} {{repository.updated_at}}, {% trans 'revision' %} {{repository.last_rev}}
+            {% else %}
+                {% trans 'added at' %} {{repository.created_at}}
+            {% endif %}
         </li>
     {% endfor %}
     </ul>
