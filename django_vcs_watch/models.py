@@ -1,5 +1,7 @@
 import os
 import uuid
+import logging
+import re
 
 from datetime import datetime
 from dateutil.parser import parse as parse_date
@@ -12,6 +14,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 
 _REVISION_LIMIT = getattr(settings, 'VCS_REVISION_LIMIT', 20)
+
 
 def strip_timezone(t):
     return datetime(t.year, t.month, t.day, t.hour, t.minute, t.second, t.microsecond)
@@ -56,8 +59,9 @@ class Repository(models.Model):
         return super(Repository, self).save()
 
     def updateFeed(self):
-        log = open('/tmp/log.txt', 'a')
-        log.write('update %s\n' % self.hash)
+        logger = logging.getLogger('django_vcs_view.repository.updateFeed')
+
+        logger.debug('update %s\n' % self.hash)
 
         options = {
             'url': self.url,
@@ -78,18 +82,18 @@ class Repository(models.Model):
 
         command = 'svn log %(limit)s%(rev)s%(username)s%(password)s --xml %(url)s' % options
 
-        print command
+        logger.debug(re.sub(r"--password '.*'", "--password 'xxxxx'", command))
+
         in_, out_ = os.popen2(command)
 
         xml = out_.read()
-        #print xml
         if not xml:
             return
 
         try:
             xml_e = ET.fromstring(xml)
         except Exception, e:
-            print e
+            logger.error(e)
             return
 
         diffs = []
@@ -102,11 +106,10 @@ class Repository(models.Model):
             msg = entry_e.find('msg').text
             date = parse_date(entry_e.find('date').text).astimezone(tzutc())
 
-            print revision, author
-            print msg
+            logger.debug('fetching revision %s by %s' % (revision, author))
+
             in_, out_ = os.popen2('svn diff -c %s %s' % (revision, self.url))
             diff = out_.read()
-            #print diff
 
             diffs.append( Revision(repos = self,
                                rev = revision,
