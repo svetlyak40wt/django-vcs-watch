@@ -11,10 +11,11 @@ Required
 
 django_globals is required to automatic update of the 'user' field.
 
-To install django_global, download it's sources and install this
-package somewhere in your python path.
+To install django_globals, download sources from a repository
+<http://github.com/svetlyak40wt/dajngo-globals/> and install
+package django_globals somewhere in your python path.
 
-Then, add 'django_global' in to the INSTALLED_APPS, and add
+Then, add 'django_globals' in to the INSTALLED_APPS, and add
 'django_globals.middleware.User' into the MIDDLEWARE_CLASSES.
 
 Optional
