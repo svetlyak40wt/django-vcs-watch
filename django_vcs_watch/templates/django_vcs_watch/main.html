@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+    <h1>{% trans 'Latest public repositories:' %}</h1>
+    <ul>
+    {% for repository in repositories %}
+        <li>
+            <a href="{{repository.hash}}">{{repository.url}}</a>, {% trans 'revision' %} {{repository.last_rev}}
+        </li>
+    {% endfor %}
+    </ul>
+    <a href="add">{% trans 'Add new watch' %}</a>
+{% endblock %}
+

@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Add new watch' %}{% endblock %}
+
+{% block content %}
+    <h1>{% trans 'Add new watch' %}</h1>
+    <form action="" method="post">
+        {{form.as_p}}
+        <input type="submit"/>
+    </form>
+{% endblock %}
+

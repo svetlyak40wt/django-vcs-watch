@@ -1,18 +1,27 @@
-{% load syntax_color %}
-{% load i18n %}
-<html>
-    <head>
-        <style>
-        {% pygments_css %}
-        ul.revisions li {border-top: 2px solid black; list-style: none;}
-        span.rev, span.date, span.author {float: left; right-padding: 2em; margin-right:1em;}
-        p.message {clear: left; margin-top: 2em; background-color: lightgray;}
-        .highlight {overflow: hidden;}
-        </style>
-        <title>{% trans 'Last changes from' %} {{object.url}}</title>
-    </head>
-    <body>
-        <h1>{% trans 'Last changes from' %} {{object.url}}</h1>
+{% extends 'base.html' %}
+{% load i18n syntax_color %}
+
+{% block style %}
+    {{block.super}}
+    {% pygments_css %}
+    ul.revisions li {border-top: 2px solid black; list-style: none;}
+    span.rev, span.date, span.author {float: left; right-padding: 2em; margin-right:1em;}
+    p.message {clear: left; margin-top: 2em; background-color: lightgray;}
+    .highlight {overflow: hidden;}
+{% endblock %}
+
+{% block head %}
+    {{ block.super }}
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="{{object.get_rss_url}}" />
+{% endblock %}
+
+
+{% block title %}{% trans 'Last changes from' %} {{object.url}}{% endblock %}
+
+{% block content %}
+    {{block.super}}
+    <h1>{% trans 'Last changes from' %} {{object.url}}</h1>
+    {% if object.revision_set.count %}
         <ul class="revisions">
         {% for diff in object.revision_set.all %}
             <li>
@@ -25,6 +34,13 @@
             </li>
         {% endfor %}
         </ul>
-    </body>
-</html>
+    {% else %}
+        <h2>{% trans 'Please, wait while we download all diffs for this repository.' %}</h2>
+        <p>
+        {% blocktrans with object.get_rss_url as rss %}
+        Now you can <a href="{{rss}}"> subscribe on RSS feed</a>, to receive all updated in time.
+        {% endblocktrans %}
+        </p>
+    {% endif %}
+{% endblock %}
 
