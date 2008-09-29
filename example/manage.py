@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 import sys
+import logging
+
+logging.basicConfig(filename='/tmp/vcs_watch.log', level=logging.DEBUG)
 
 sys.path.append('/home/art/my-apps')
 sys.path.append('/home/art/contrib-apps')
