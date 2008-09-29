@@ -26,8 +26,8 @@ add_page = {
 
 urlpatterns = patterns('django.views.generic',
    (r'^(?P<slug>[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})/$', 'list_detail.object_detail', info_dict),
-   (r'^add/$', 'create_update.create_object', add_page),
-   (r'^$', 'simple.direct_to_template', main_page),
+   (r'^add/$', 'create_update.create_object', add_page, 'vcs-add'),
+   (r'^$', 'simple.direct_to_template', main_page, 'vcs-main-page'),
 )
 
 urlpatterns += patterns('django.contrib.syndication.views',
