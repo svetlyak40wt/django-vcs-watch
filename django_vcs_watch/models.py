@@ -24,7 +24,9 @@ class Repository(models.Model):
     hash = models.CharField('Hash', editable=False, max_length=36)
     url = models.URLField('URL', verify_exists=False)
     last_rev = models.CharField('Last revision', editable=False, max_length=32)
-    last_access = models.DateTimeField('Date', editable=False, null=True)
+    last_access = models.DateTimeField('Last access date', editable=False, null=True)
+    created_at = models.DateTimeField('Created at', editable=False)
+    updated_at = models.DateTimeField('Updated at', editable=False)
     public = models.BooleanField(
             'Public',
             default=True,
@@ -38,6 +40,8 @@ class Repository(models.Model):
     class Meta:
         verbose_name = 'Repository'
         verbose_name_plural = 'Repositories'
+        ordering = ('-updated_at',)
+
 
     def __unicode__(self):
         return 'Repository at %s' % self.url
@@ -50,8 +54,11 @@ class Repository(models.Model):
         return ('vcs-watch-feeds', (), {'url': 'diffs/%s' % self.hash })
 
     def save(self):
-        if self.id is None:
+        seld.updated_at = datetime.today()
+
+        if not self.id:
             self.hash = unicode(uuid.uuid4())
+            self.created_at = self.updated_at
 
         if self.username and self.password:
             self.public = False
