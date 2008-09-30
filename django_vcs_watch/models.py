@@ -13,6 +13,7 @@ from xml.etree import ElementTree as ET
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.utils.translation import ugettext_lazy as _
 
 _REVISION_LIMIT = getattr(settings, 'VCS_REVISION_LIMIT', 20)
 
@@ -27,30 +28,30 @@ def strip_timezone(t):
 
 class Repository(models.Model):
     user = models.ForeignKey(User, editable=False, blank=True, null=True)
-    hash = models.CharField('Hash', editable=False, max_length=36)
-    url = models.URLField('URL', verify_exists=False)
-    last_rev = models.CharField('Last revision', editable=False, max_length=32)
-    last_access = models.DateTimeField('Last access date', editable=False, null=True)
-    created_at = models.DateTimeField('Created at', editable=False)
-    updated_at = models.DateTimeField('Updated at', editable=False)
+    hash = models.CharField(_('Hash'), editable=False, max_length=36)
+    url = models.URLField(_('URL'), verify_exists=False)
+    last_rev = models.CharField(_('Last revision'), editable=False, max_length=32)
+    last_access = models.DateTimeField(_('Last access date'), editable=False, null=True)
+    created_at = models.DateTimeField(_('Created at'), editable=False)
+    updated_at = models.DateTimeField(_('Updated at'), editable=False)
     public = models.BooleanField(
-            'Public',
+            _('Public'),
             default=True,
-            help_text='Repositories which require authentication, can\'t be public.')
+            help_text=_('Public repositories are show at the main page, when updated. Repositories which require authentication, can\'t be public.'))
     username = models.CharField(
-            'Username', max_length=40, blank=True,
-            help_text='Leave empty for anonymous access.')
+            _('Username'), max_length=40, blank=True,
+            help_text=_('Leave empty for anonymous access.'))
     password = models.CharField(
-            'Password', max_length=40, blank=True)
+            _('Password'), max_length=40, blank=True)
 
     class Meta:
-        verbose_name = 'Repository'
-        verbose_name_plural = 'Repositories'
+        verbose_name = _('Repository')
+        verbose_name_plural = _('Repositories')
         ordering = ('-updated_at',)
 
 
     def __unicode__(self):
-        return 'Repository at %s' % self.url
+        return _('Repository at %s') % self.url
 
     @models.permalink
     def get_absolute_url(self):
@@ -152,14 +153,14 @@ class Repository(models.Model):
 
 class Revision(models.Model):
     repos = models.ForeignKey(Repository)
-    rev = models.CharField(name='Revision', max_length=36)
-    author = models.CharField(name='Author', max_length=40)
-    date = models.DateTimeField(name='Date')
-    message = models.TextField(name='Message')
-    diff = models.TextField(name='Diff')
+    rev = models.CharField(name=_('Revision'), max_length=36)
+    author = models.CharField(name=_('Author'), max_length=40)
+    date = models.DateTimeField(name=_('Date'))
+    message = models.TextField(name=_('Message'))
+    diff = models.TextField(name=_('Diff'))
 
     def __unicode__(self):
-        return 'Revision %s' % self.rev
+        return _('Revision %s') % self.rev
 
     @models.permalink
     def get_absolute_url(self):
