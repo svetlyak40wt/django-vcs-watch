@@ -6,7 +6,7 @@
     <ul>
     {% for repository in repositories %}
         <li>
-            <a href="{{repository.hash}}">{{repository.url}}</a>
+            <a href="{% url vcs-watch-repository repository.hash %}">{{repository.url}}</a>
             {% if repository.last_rev %}
                 {% trans 'updated at' %} {{repository.updated_at}}, {% trans 'revision' %} {{repository.last_rev}}
             {% else %}
@@ -15,6 +15,6 @@
         </li>
     {% endfor %}
     </ul>
-    <a href="add">{% trans 'Add new watch' %}</a>
+    <a href="{% url vcs-watch-add %}">{% trans 'Add new watch' %}</a>
 {% endblock %}
 
