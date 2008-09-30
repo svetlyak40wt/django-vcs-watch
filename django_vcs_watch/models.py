@@ -138,7 +138,7 @@ class Repository(models.Model):
                         )
 
         for diff in reversed(diffs):
-            logger.debug('saving diff for revision %s' % diff.rev)
+            logger.debug('saving %s r%s' % (self.url, diff.rev))
             diff.save()
             self.last_rev = diff.rev
 
