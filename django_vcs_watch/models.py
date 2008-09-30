@@ -26,7 +26,7 @@ def strip_timezone(t):
     return datetime(t.year, t.month, t.day, t.hour, t.minute, t.second, t.microsecond)
 
 class Repository(models.Model):
-    user = models.ForeignKey(User, editable=False, null=True)
+    user = models.ForeignKey(User, editable=False, blank=True, null=True)
     hash = models.CharField('Hash', editable=False, max_length=36)
     url = models.URLField('URL', verify_exists=False)
     last_rev = models.CharField('Last revision', editable=False, max_length=32)
@@ -68,7 +68,8 @@ class Repository(models.Model):
             self.created_at = self.updated_at
 
             from django_globals import globals
-            self.user = globals.user
+            if isinstance(globals.user, User):
+                self.user = globals.user
 
         if self.username and self.password:
             self.public = False
