@@ -99,7 +99,7 @@ class Repository(models.Model):
         if self.password:
             options['password'] = ' --password \'%s\' ' % self.password
 
-        command = 'svn log %(limit)s%(rev)s%(username)s%(password)s --xml %(url)s' % options
+        command = 'svn log --non-interactive %(limit)s%(rev)s%(username)s%(password)s --xml %(url)s' % options
 
         logger.debug(re.sub(r"--password '.*'", "--password 'xxxxx'", command))
 
