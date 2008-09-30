@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load i18n syntax_color %}
+
+{% block style %}
+    {{block.super}}
+    {% pygments_css %}
+    ul.revisions li {border-top: 2px solid black; list-style: none;}
+    span.rev, span.date, span.author {float: left; right-padding: 2em; margin-right:1em;}
+    p.message {clear: left; margin-top: 2em; background-color: lightgray;}
+    .highlight {overflow: hidden;}
+{% endblock %}
+
+{% block title %}{% trans 'Revision ' %} {{object.rev}}{% endblock %}
+
+{% block content %}
+    {{block.super}}
+    <h1>{% trans 'Revision ' %} {{object.rev}}</h1>
+    <ul class="revisions">
+        <li>
+        <span class="rev">{% trans 'Revision' %}:&nbsp;{{object.rev}}</span>
+        <span class="date">{% trans 'Date' %}:&nbsp;{{object.date}}</span>
+        <span class="author">{% trans 'Author' %}:&nbsp;{{object.author}}</span>
+        <p class="message">{{object.message}}</p>
+
+        {{object.diff|colorize:"diff"}}
+        </li>
+    </ul>
+{% endblock %}
+
+

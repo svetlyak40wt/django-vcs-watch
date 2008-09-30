@@ -1,5 +1,4 @@
 {% load i18n %}
 {% load syntax_color %}
-<span style="float: left; right-padding: 2em; margin-right:1em;">{% trans 'Author' %}:&nbsp;{{obj.author}}</span>
 <p style="clear: left; margin-top: 2em; background-color: lightgray;">{{obj.message}}</p>
 {{obj.diff|colorize_noclasses:"diff"}}

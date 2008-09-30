@@ -52,8 +52,9 @@ class Repository(models.Model):
     def __unicode__(self):
         return 'Repository at %s' % self.url
 
+    @models.permalink
     def get_absolute_url(self):
-        return '/vcs/%s/' % self.hash
+        return ('vcs-watch-repository', (), {'slug': self.hash})
 
     @models.permalink
     def get_rss_url(self):
@@ -130,13 +131,14 @@ class Repository(models.Model):
             diffs.append( Revision(repos = self,
                                rev = revision,
                                diff=diff,
-                               message=msg,
+                               message=msg or '',
                                date=strip_timezone(date),
                                author=author
                                )
                         )
 
         for diff in reversed(diffs):
+            logger.debug('saving diff for revision %s' % diff.rev)
             diff.save()
             self.last_rev = diff.rev
 
@@ -158,8 +160,9 @@ class Revision(models.Model):
     def __unicode__(self):
         return 'Revision %s' % self.rev
 
+    @models.permalink
     def get_absolute_url(self):
-        return '/vcs/%s/%s/' % (self.repos.hash, self.rev)
+        return ('vcs-watch-revision', (), {'repository_hash': self.repos.hash, 'revision': self.rev})
 
     class Meta:
         ordering = ('-date',)

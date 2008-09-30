@@ -37,7 +37,7 @@
     {% else %}
         <h2>{% trans 'Please, wait while we download all diffs for this repository.' %}</h2>
         <p>
-        {% url vcs-add as add_url %}
+        {% url vcs-watch-add as add_url %}
         {% blocktrans with object.get_rss_url as rss %}
         Now you can <a href="{{rss}}"> subscribe on RSS feed</a>, to receive all updated in time. Or <a href="{{add_url}}">add another repository</a>.
         {% endblocktrans %}

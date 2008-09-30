@@ -1,10 +1,15 @@
 from django.conf.urls.defaults import *
-from models import Repository
+from models import Repository, Revision
 from forms import RepositoryForm
 from feeds import LatestRevisions, LatestRepositories
 
-info_dict = {
+repository_info = {
     'queryset': Repository.objects.all(),
+    'slug_field': 'hash'
+}
+
+revision_info = {
+    'queryset': Revision.objects.all(),
     'slug_field': 'hash'
 }
 
@@ -25,9 +30,13 @@ add_page = {
 }
 
 urlpatterns = patterns('django.views.generic',
-   (r'^(?P<slug>[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})/$', 'list_detail.object_detail', info_dict),
-   (r'^add/$', 'create_update.create_object', add_page, 'vcs-add'),
-   (r'^$', 'simple.direct_to_template', main_page, 'vcs-main-page'),
+   (r'^(?P<slug>[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})/$', 'list_detail.object_detail', repository_info, 'vcs-watch-repository'),
+   (r'^add/$', 'create_update.create_object', add_page, 'vcs-watch-add'),
+   (r'^$', 'simple.direct_to_template', main_page, 'vcs-watch-main-page'),
+)
+
+urlpatterns += patterns('django_vcs_watch.views',
+   (r'^(?P<repository_hash>[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})/(?P<revision>[a-z0-9-]{1,36})/$', 'revision', {}, 'vcs-watch-revision'),
 )
 
 urlpatterns += patterns('django.contrib.syndication.views',
