@@ -4,10 +4,23 @@
 {% block title %}{% trans 'Add new watch' %}{% endblock %}
 
 {% block content %}
-    <h1>{% trans 'Add new watch' %}</h1>
+    <h1>{% trans 'Add a new watch' %}</h1>
     <form action="" method="post">
-        {{form.as_p}}
-        <input type="submit"/>
+        {% if user.is_anonymous %}
+            <p>
+            {{ form.url.errors }}
+            <label for="id_url">{% trans 'URL' %}:</label>
+            {{ form.url }}
+            </p>
+        {% else %}
+            {{form.as_p}}
+        {% endif %}
+        <input type="submit" value="{% trans 'Add' %}"/>
     </form>
+    {% if user.is_anonymous %}
+        <p>{% blocktrans %}
+        To be able to add nonpublic repositories you must sign-in.
+        {% endblocktrans %}</p>
+    {% endif %}
 {% endblock %}
 

@@ -3,6 +3,8 @@ from models import Repository, Revision
 from forms import RepositoryForm
 from feeds import LatestRevisions, LatestRepositories
 
+from django_globals import globals
+
 repository_info = {
     'queryset': Repository.objects.all(),
     'slug_field': 'hash'
@@ -27,6 +29,7 @@ main_page = {
 
 add_page = {
     'form_class': RepositoryForm,
+    'extra_context': { 'user': lambda: globals.user },
 }
 
 urlpatterns = patterns('django.views.generic',
