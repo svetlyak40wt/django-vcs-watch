@@ -14,6 +14,7 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import DjangoUnicodeDecodeError
 
 _REVISION_LIMIT = getattr(settings, 'VCS_REVISION_LIMIT', 20)
 
@@ -141,7 +142,13 @@ class Repository(models.Model):
 
         for diff in reversed(diffs):
             logger.debug('saving %s r%s' % (self.url, diff.rev))
-            diff.save()
+            try:
+                diff.save()
+            except DjangoUnicodeDecodeError:
+                # just ignore this strange errors,
+                # caused by wrong encoding in the comments
+                # or binary files without mime type.
+                logger.error('unicode decode exception on saving %s:%s' % (self.url, diff.rev))
             self.last_rev = diff.rev
 
         if len(diffs) > 0:
