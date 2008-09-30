@@ -1,8 +1,8 @@
 TODO
 ====
 
+* Anonymous repository creator.
 * Use reverse lookup.
-* Add page to view one revision in the repository.
 * Add page to view user's repository feeds.
 * Refactor templates/django_vcs_watch/revision_detail.html and
   templates/django_vcs_watch/repository_detail.html to make
