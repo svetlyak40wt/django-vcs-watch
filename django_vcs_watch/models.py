@@ -16,7 +16,10 @@ from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import DjangoUnicodeDecodeError
 
+from django_fields.fields import EncryptedCharField
+
 _REVISION_LIMIT = getattr(settings, 'VCS_REVISION_LIMIT', 20)
+
 
 if 'django_globals' not in settings.INSTALLED_APPS:
     raise Exception('Please, install django_globals application.')
@@ -42,8 +45,9 @@ class Repository(models.Model):
     username = models.CharField(
             _('Username'), max_length=40, blank=True,
             help_text=_('Leave empty for anonymous access.'))
-    password = models.CharField(
+    password = EncryptedCharField(
             _('Password'), max_length=40, blank=True)
+
 
     class Meta:
         verbose_name = _('Repository')

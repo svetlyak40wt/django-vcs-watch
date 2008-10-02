@@ -9,7 +9,7 @@ Dependencies
 Required
 --------
 
-django_globals is required to automatic update of the 'user' field.
+**django_globals** is required to automatic update of the 'user' field.
 
 To install django_globals, download sources from a repository
 <http://github.com/svetlyak40wt/dajngo-globals/> and install
@@ -17,6 +17,10 @@ package django_globals somewhere in your python path.
 
 Then, add 'django_globals' in to the INSTALLED_APPS, and add
 'django_globals.middleware.User' into the MIDDLEWARE_CLASSES.
+
+**django_fields** required for encrypted passwords and authentication.
+You can find it at <http://github.com/svetlyak40wt/dajngo-fields>, also,
+it have it's own dependencies, for example, from django-pycrypto.
 
 Optional
 --------
