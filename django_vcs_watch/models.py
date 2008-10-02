@@ -172,7 +172,7 @@ class Revision(models.Model):
     diff = models.TextField(name=_('Diff'))
 
     def __unicode__(self):
-        return _('Revision %s') % self.rev
+        return _('Revision %(rev)s by %(author)s') % self.__dict__
 
     @models.permalink
     def get_absolute_url(self):
