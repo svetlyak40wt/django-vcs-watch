@@ -74,8 +74,9 @@ class Repository(models.Model):
             self.created_at = self.updated_at
 
             from django_globals import globals
-            if isinstance(globals.user, User):
-                self.user = globals.user
+            user = getattr(globals, 'user', None)
+            if isinstance(user, User):
+                self.user = user
 
         if self.username and self.password:
             self.public = False
