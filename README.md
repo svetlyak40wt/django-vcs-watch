@@ -25,3 +25,7 @@ There are some test templates in the templates/django_vcs_watch.
 They use modified 'Colorize' filter by [Will Larson](http://lethain.com/author/will-larson/),
 but you can use another colorizer in your own templates.
 
+Example
+-------
+
+Example project is in the `example` directory.
