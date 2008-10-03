@@ -22,6 +22,10 @@ Then, add 'django_globals' in to the INSTALLED_APPS, and add
 You can find it at <http://github.com/svetlyak40wt/dajngo-fields>, also,
 it have it's own dependencies, for example, from django-pycrypto.
 
+**python-dateutil** this package used to parse ISO dates.
+Under *debian* like systems, just do `sudo apt-get install python-dateutil`
+
+
 Optional
 --------
 
