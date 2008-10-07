@@ -15,6 +15,7 @@ class Repositories(TestCase):
             self.tester = User.objects.create_user(username='tester', email='tester@example.com', password='test')
 
         self.add_url = reverse('vcs-watch-add')
+        self.login_url = reverse('vcs-watch-add')
 
         Repository.objects.all().delete()
         super(Repositories, self).setUp()
@@ -48,3 +49,55 @@ class Repositories(TestCase):
         url = reverse('vcs-watch-repository', kwargs = dict(slug=reps[0].hash))
         self.assertRedirects(response, url)
 
+    def testAddByAuthorized(self):
+        self.assert_(self.client.login(username='tester', password='test'))
+        url = 'http://svn.example.com/trunk/'
+        response = self.client.post(self.add_url, dict(
+                                        url=url,
+                                        username='svnuser',
+                                        password='svnpass',
+                                        ))
+
+        reps = Repository.objects.all()
+        self.assertEqual(1, len(reps))
+        self.assertEqual(url, reps[0].url)
+        self.assertEqual(False, reps[0].public)
+        self.assertEqual('svnuser', reps[0].username)
+        self.assertEqual('svnpass', reps[0].password)
+
+        url = reverse('vcs-watch-repository', kwargs = dict(slug=reps[0].hash))
+        self.assertRedirects(response, url)
+
+    def testAllowAccessOnlyToMinePrivateRepos(self):
+        self.assert_(self.client.login(username='tester', password='test'))
+
+        response = self.client.get(reverse('vcs-watch-user', kwargs=dict(username='another')))
+        self.assertEqual(403, response.status_code)
+
+        user_url = reverse('vcs-watch-user', kwargs=dict(username='tester'))
+        response = self.client.get(user_url)
+        self.assertEqual(200, response.status_code)
+
+        self.client.logout()
+        response = self.client.get(user_url)
+        self.assertRedirects(response, '/accounts/login/?next=%s' % user_url)
+
+    def testPrivateReposList(self):
+        self.assert_(self.client.login(username='tester', password='test'))
+
+        url = 'http://svn.example.com/trunk/'
+        hashes = []
+        for i in xrange(10):
+            response = self.client.post(self.add_url, dict(
+                                            url=url,
+                                            username='svnuser',
+                                            password='svnpass',
+                                            ))
+            hashes.append(response.get('Location', None).split('/')[-2])
+
+        user_url = reverse('vcs-watch-user', kwargs=dict(username='tester'))
+        response = self.client.get(user_url)
+        self.assertEqual(200, response.status_code)
+
+        for hash in hashes:
+            self.assertContains(response, hash)

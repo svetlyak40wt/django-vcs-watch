@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block headline %}{% block title %}{% trans 'You repositories' %} {{object.url}}{% endblock %}{% endblock %}
+
+{% block content %}
+    {{block.super}}
+
+    {% if object_list %}
+        <ul>
+        {% for object in object_list %}
+            <li><a href="{% url vcs-watch-repository object.hash %}">{{object.url}}</a></li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>
+            {% url vcs-watch-add as add_url %}
+            {% blocktrans %}
+            You don't have watch any repositories right now. Do you want <a href="{{add_url}}">to add one</a>?
+            {% endblocktrans %}
+        </p>
+    {% endif %}
+{% endblock %}
