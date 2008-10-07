@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 {% load i18n %}
 
+{% block headline %}{% block title %}{% if repositories %}{% trans 'Latest public repositories' %}{% else %}{% trans 'There is no public repositories right now' %}{% endif %}{% endblock %}{% endblock %}
+
 {% block content %}
-    <h1>{% trans 'Latest public repositories:' %}</h1>
     <ul>
     {% for repository in repositories %}
         <li>

@@ -5,6 +5,7 @@
         {% block head %}{% endblock %}
     </head>
     <body>
+        {% block full_headline %}<h1>{% block headline %}{% endblock %}{% endblock %}
         {% block content %}{% endblock %}
     </body>
 </html>

@@ -16,11 +16,10 @@
 {% endblock %}
 
 
-{% block title %}{% trans 'Last changes from' %} {{object.url}}{% endblock %}
+{% block headline %}{% block title %}{% trans 'Last changes from' %} {{object.url}}{% endblock %}{% endblock %}
 
 {% block content %}
     {{block.super}}
-    <h1>{% trans 'Last changes from' %} {{object.url}}</h1>
     {% if object.revision_set.count %}
         <ul class="revisions">
         {% for diff in object.revision_set.all %}

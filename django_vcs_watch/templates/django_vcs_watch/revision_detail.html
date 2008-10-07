@@ -10,11 +10,10 @@
     .highlight {overflow: hidden;}
 {% endblock %}
 
-{% block title %}{% trans 'Revision ' %} {{object.rev}}{% endblock %}
+{% block headline %}{% block title %}{% trans 'Revision ' %} {{object.rev}}{% endblock %}{% endblock %}
 
 {% block content %}
     {{block.super}}
-    <h1>{% trans 'Revision ' %} {{object.rev}}</h1>
     <ul class="revisions">
         <li>
         <span class="rev">{% trans 'Revision' %}:&nbsp;{{object.rev}}</span>
