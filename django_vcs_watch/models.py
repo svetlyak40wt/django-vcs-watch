@@ -77,6 +77,8 @@ class Repository(models.Model):
             user = getattr(globals, 'user', None)
             if isinstance(user, User):
                 self.user = user
+            else:
+                self.public = True
 
         if self.username and self.password:
             self.public = False
