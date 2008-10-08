@@ -55,7 +55,7 @@ msgstr "Обновлен в"
 
 #: models.py:42
 msgid "Public"
-msgstr "Побличный"
+msgstr "Публичный"
 
 #: models.py:44
 msgid ""
