@@ -1,9 +1,11 @@
 {% extends 'base.html' %}
 {% load i18n %}
 
-{% block headline %}{% block title %}{% trans 'Add new watch' %}{% endblock %}{% endblock %}
+{% block headline %}{% block title %}{% trans 'Watch on repository' %}{% endblock %}{% endblock %}
 
 {% block content %}
+    <p>{% trans 'Only URLs of SVN repositories are support now.' %}</p>
+
     <form action="" method="post">
         {% if user.is_anonymous %}
             <p>
@@ -17,9 +19,7 @@
         <input type="submit" value="{% trans 'Add' %}"/>
     </form>
     {% if user.is_anonymous %}
-        <p>{% blocktrans %}
-        To be able to add nonpublic repositories you must sign-in.
-        {% endblocktrans %}</p>
+        <p>{% trans 'To be able to add nonpublic repositories you must sign-in.' %}</p>
     {% endif %}
 {% endblock %}
 

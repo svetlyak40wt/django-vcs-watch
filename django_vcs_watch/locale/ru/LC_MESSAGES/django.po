@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-10-08 16:59+0400\n"
+"POT-Creation-Date: 2008-10-08 17:42+0400\n"
 "PO-Revision-Date: 2008-10-07 22:30+3\n"
 "Last-Translator: Alexander Artemenko <svetlyak.40wt@gmail.com>\n"
 "Language-Team: ru <ru@li.org>\n"
@@ -33,7 +33,7 @@ msgstr "Последние изменения с %s"
 msgid "Hash"
 msgstr "Хэш"
 
-#: models.py:36 templates/django_vcs_watch/repository_form.html:11
+#: models.py:36 templates/django_vcs_watch/repository_form.html:13
 msgid "URL"
 msgstr "URL"
 
@@ -62,7 +62,8 @@ msgid ""
 "Public repositories are show at the main page, when updated. Repositories "
 "which require authentication, can't be public."
 msgstr ""
-"Обновления публичных репозиториев отображаются на главной странице. Репозитории, требующие авторизации, не могут быть публичными."
+"Обновления публичных репозиториев отображаются на главной странице. "
+"Репозитории, требующие авторизации, не могут быть публичными."
 
 #: models.py:46
 msgid "Username"
@@ -90,6 +91,7 @@ msgid "Repository at %s"
 msgstr "Репозиторий %s"
 
 #: models.py:170 templates/django_vcs_watch/repository_detail.html:27
+#: templates/django_vcs_watch/revision_detail.html:13
 #: templates/django_vcs_watch/revision_detail.html:19
 msgid "Revision"
 msgstr "Ревизия"
@@ -138,9 +140,8 @@ msgid "added at"
 msgstr "добавлен в"
 
 #: templates/django_vcs_watch/main.html:19
-#: templates/django_vcs_watch/repository_form.html:4
-msgid "Add new watch"
-msgstr "Следить за новым"
+msgid "Watch on another repository"
+msgstr "Следить за другим репозиторием"
 
 #: templates/django_vcs_watch/repository_detail.html:19
 msgid "Last changes from"
@@ -148,7 +149,8 @@ msgstr "Последние изменения с"
 
 #: templates/django_vcs_watch/repository_detail.html:37
 msgid "Please, wait while we download all diffs for this repository."
-msgstr "Пожалуйста. подождите, пока будут выкачаны диффы для этого репозитория."
+msgstr ""
+"Пожалуйста. подождите, пока будут выкачаны диффы для этого репозитория."
 
 #: templates/django_vcs_watch/repository_detail.html:40
 #, python-format
@@ -160,23 +162,26 @@ msgid ""
 "        "
 msgstr ""
 "\n"
-"        Теперь вы можете <a href=\"%(rss)s\"> подписаться на RSS фид</a>, чтобы "
-"вовремя получать все обновления. Или <a href=\"%(add_url)s\">добавить друго репозиторий</a>.\n"
+"        Теперь вы можете <a href=\"%(rss)s\"> подписаться на RSS фид</a>, "
+"чтобы вовремя получать все обновления. Или <a href=\"%(add_url)s\">добавить "
+"друго репозиторий</a>.\n"
 "        "
 
-#: templates/django_vcs_watch/repository_form.html:17
+#: templates/django_vcs_watch/repository_form.html:4
+msgid "Watch on repository"
+msgstr "Следить за репозиторием"
+
+#: templates/django_vcs_watch/repository_form.html:7
+msgid "Only URLs of SVN repositories are support now."
+msgstr "Пока что поддерживаются только URL SVN репозиториев."
+
+#: templates/django_vcs_watch/repository_form.html:19
 msgid "Add"
 msgstr "Добавить"
 
-#: templates/django_vcs_watch/repository_form.html:20
-msgid ""
-"\n"
-"        To be able to add nonpublic repositories you must sign-in.\n"
-"        "
-msgstr ""
-"\n"
-"        Чтобы добавлять непубличные репозитории, необходимо зарегистрироваться.\n"
-"        "
+#: templates/django_vcs_watch/repository_form.html:22
+msgid "To be able to add nonpublic repositories you must sign-in."
+msgstr "Чтобы добавлять непубличные репозитории, необходимо зарегистрироваться."
 
 #: templates/django_vcs_watch/repository_list.html:4
 msgid "You repositories"
@@ -221,3 +226,5 @@ msgstr ""
 msgid "You don't have watch any repositories right now."
 msgstr "Прямо сейчас вы не следите ни зи одним репозиторием."
 
+#~ msgid "Add new watch"
+#~ msgstr "Следить за новым"
