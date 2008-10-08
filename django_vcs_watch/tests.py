@@ -68,20 +68,6 @@ class Repositories(TestCase):
         url = reverse('vcs-watch-repository', kwargs = dict(slug=reps[0].hash))
         self.assertRedirects(response, url)
 
-    def testAllowAccessOnlyToMinePrivateRepos(self):
-        self.assert_(self.client.login(username='tester', password='test'))
-
-        response = self.client.get(reverse('vcs-watch-user', kwargs=dict(username='another')))
-        self.assertEqual(403, response.status_code)
-
-        user_url = reverse('vcs-watch-user', kwargs=dict(username='tester'))
-        response = self.client.get(user_url)
-        self.assertEqual(200, response.status_code)
-
-        self.client.logout()
-        response = self.client.get(user_url)
-        self.assertRedirects(response, '/accounts/login/?next=%s' % user_url)
-
     def testPrivateReposList(self):
         self.assert_(self.client.login(username='tester', password='test'))
 
@@ -95,7 +81,7 @@ class Repositories(TestCase):
                                             ))
             hashes.append(response.get('Location', None).split('/')[-2])
 
-        user_url = reverse('vcs-watch-user', kwargs=dict(username='tester'))
+        user_url = reverse('vcs-watch-profile')
         response = self.client.get(user_url)
         self.assertEqual(200, response.status_code)
 

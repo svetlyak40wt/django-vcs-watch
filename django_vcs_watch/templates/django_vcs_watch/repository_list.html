@@ -1,23 +1,46 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n humanize %}
 
 {% block headline %}{% block title %}{% trans 'You repositories' %} {{object.url}}{% endblock %}{% endblock %}
 
 {% block content %}
     {{block.super}}
 
+    {% url vcs-watch-add as add_url %}
+
     {% if object_list %}
         <ul>
         {% for object in object_list %}
-            <li><a href="{% url vcs-watch-repository object.hash %}">{{object.url}}</a></li>
+            <li>
+                <a href="{% url vcs-watch-repository object.hash %}">{{object.url}}</a>,
+                {% if object.public %}
+                    {% trans 'public repository' %},
+                {% else %}
+                    {% trans 'non-public repository' %},
+                {% endif %}
+                {% if object.updated_at %}
+                    {% blocktrans with object.updated_at|naturalday as updated_at %}
+                    updated at {{updated_at}}
+                    {% endblocktrans %}
+                {% else %}
+                    {% trans 'pending for update' %}
+                {% endif %}
+
+            </li>
         {% endfor %}
+
         </ul>
-    {% else %}
         <p>
-            {% url vcs-watch-add as add_url %}
-            {% blocktrans %}
-            You don't have watch any repositories right now. Do you want <a href="{{add_url}}">to add one</a>?
-            {% endblocktrans %}
+        {% blocktrans %}
+        Do you want <a href="{{add_url}}">to add one</a>?
+        {% endblocktrans %}
+        </p>
+    {% else %}
+        <p>{% blocktrans %}You don't have watch any repositories right now.{% endblocktrans %}</p>
+        <p>
+        {% blocktrans %}
+        Do you want <a href="{{add_url}}">to add one</a>?
+        {% endblocktrans %}
         </p>
     {% endif %}
 {% endblock %}

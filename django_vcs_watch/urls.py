@@ -40,7 +40,7 @@ urlpatterns = patterns('django.views.generic',
 
 urlpatterns += patterns('django_vcs_watch.views',
    (r'^(?P<repository_hash>[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})/(?P<revision>[a-z0-9-]{1,36})/$', 'revision', {}, 'vcs-watch-revision'),
-   (r'^user/(?P<username>\w+)/$', 'user', {}, 'vcs-watch-user'),
+   (r'^profile/$', 'profile', {}, 'vcs-watch-profile'),
 )
 
 urlpatterns += patterns('django.contrib.syndication.views',
