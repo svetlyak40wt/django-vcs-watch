@@ -34,7 +34,7 @@
         {% endfor %}
         </ul>
     {% else %}
-        <h2>{% trans 'Please, wait while we download all diffs for this repository.' %}</h2>
+        <p>{% trans 'Please, wait while we download all diffs for this repository.' %}</p>
         <p>
         {% url vcs-watch-add as add_url %}
         {% blocktrans with object.get_rss_url as rss %}
