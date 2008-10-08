@@ -12,7 +12,7 @@
 
 {% block head %}
     {{ block.super }}
-    <link rel="alternate" type="application/rss+xml" title="RSS" href="{{object.get_rss_url}}" />
+    <link rel="alternate" type="application/rss+xml" title="{% trans 'Last changes from' %} {{object.url}}, RSS" href="{{object.get_rss_url}}" />
 {% endblock %}
 
 

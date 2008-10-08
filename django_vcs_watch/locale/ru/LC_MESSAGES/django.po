@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-10-08 17:42+0400\n"
+"POT-Creation-Date: 2008-10-08 18:04+0400\n"
 "PO-Revision-Date: 2008-10-07 22:30+3\n"
 "Last-Translator: Alexander Artemenko <svetlyak.40wt@gmail.com>\n"
 "Language-Team: ru <ru@li.org>\n"
@@ -143,6 +143,7 @@ msgstr "добавлен в"
 msgid "Watch on another repository"
 msgstr "Следить за другим репозиторием"
 
+#: templates/django_vcs_watch/repository_detail.html:15
 #: templates/django_vcs_watch/repository_detail.html:19
 msgid "Last changes from"
 msgstr "Последние изменения с"
@@ -181,7 +182,8 @@ msgstr "Добавить"
 
 #: templates/django_vcs_watch/repository_form.html:22
 msgid "To be able to add nonpublic repositories you must sign-in."
-msgstr "Чтобы добавлять непубличные репозитории, необходимо зарегистрироваться."
+msgstr ""
+"Чтобы добавлять непубличные репозитории, необходимо зарегистрироваться."
 
 #: templates/django_vcs_watch/repository_list.html:4
 msgid "You repositories"
@@ -226,5 +228,3 @@ msgstr ""
 msgid "You don't have watch any repositories right now."
 msgstr "Прямо сейчас вы не следите ни зи одним репозиторием."
 
-#~ msgid "Add new watch"
-#~ msgstr "Следить за новым"
