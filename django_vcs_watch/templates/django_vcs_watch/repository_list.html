@@ -19,9 +19,7 @@
                     {% trans 'non-public repository' %},
                 {% endif %}
                 {% if object.updated_at %}
-                    {% blocktrans with object.updated_at|naturalday as updated_at %}
-                    updated at {{updated_at}}
-                    {% endblocktrans %}
+                    {% blocktrans with object.updated_at|naturalday as updated_at %}updated at {{updated_at}}{% endblocktrans %}
                 {% else %}
                     {% trans 'pending for update' %}
                 {% endif %}

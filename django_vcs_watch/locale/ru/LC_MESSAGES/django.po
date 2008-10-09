@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-10-08 18:04+0400\n"
+"POT-Creation-Date: 2008-10-09 11:11+0400\n"
 "PO-Revision-Date: 2008-10-07 22:30+3\n"
 "Last-Translator: Alexander Artemenko <svetlyak.40wt@gmail.com>\n"
 "Language-Team: ru <ru@li.org>\n"
@@ -128,18 +128,20 @@ msgid "There is no public repositories right now"
 msgstr "Пока нет ни одного публичного репозитория"
 
 #: templates/django_vcs_watch/main.html:12
-msgid "updated at"
-msgstr "обновлен в"
+#: templates/django_vcs_watch/repository_list.html:22
+#, python-format
+msgid "updated at %(updated_at)s"
+msgstr "обновлен %(updated_at)s"
 
-#: templates/django_vcs_watch/main.html:12
+#: templates/django_vcs_watch/main.html:13
 msgid "revision"
 msgstr "ревизия"
 
-#: templates/django_vcs_watch/main.html:14
+#: templates/django_vcs_watch/main.html:15
 msgid "added at"
 msgstr "добавлен в"
 
-#: templates/django_vcs_watch/main.html:19
+#: templates/django_vcs_watch/main.html:20
 msgid "Watch on another repository"
 msgstr "Следить за другим репозиторием"
 
@@ -197,23 +199,12 @@ msgstr "публичный репозиторий"
 msgid "non-public repository"
 msgstr "непубличный репозиторий"
 
-#: templates/django_vcs_watch/repository_list.html:22
-#, python-format
-msgid ""
-"\n"
-"                    updated at %(updated_at)s\n"
-"                    "
-msgstr ""
-"\n"
-"                    обновлен %(updated_at)s\n"
-"                    "
-
-#: templates/django_vcs_watch/repository_list.html:26
+#: templates/django_vcs_watch/repository_list.html:24
 msgid "pending for update"
 msgstr "ждет обновления"
 
-#: templates/django_vcs_watch/repository_list.html:34
-#: templates/django_vcs_watch/repository_list.html:41
+#: templates/django_vcs_watch/repository_list.html:32
+#: templates/django_vcs_watch/repository_list.html:39
 #, python-format
 msgid ""
 "\n"
@@ -224,7 +215,7 @@ msgstr ""
 "        Хотите <a href=\"%(add_url)s\">добавить еще один</a>?\n"
 "        "
 
-#: templates/django_vcs_watch/repository_list.html:39
+#: templates/django_vcs_watch/repository_list.html:37
 msgid "You don't have watch any repositories right now."
 msgstr "Прямо сейчас вы не следите ни зи одним репозиторием."
 
