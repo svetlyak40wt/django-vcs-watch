@@ -67,11 +67,9 @@ class Repository(models.Model):
         return ('vcs-watch-feeds', (), {'url': 'diffs/%s' % self.hash })
 
     def save(self):
-        self.updated_at = datetime.today()
-
         if not self.id:
             self.hash = unicode(uuid.uuid4())
-            self.created_at = self.updated_at
+            self.created_at = datetime.today()
 
             from django_globals import globals
             user = getattr(globals, 'user', None)
@@ -157,6 +155,8 @@ class Repository(models.Model):
                 # or binary files without mime type.
                 logger.error('unicode decode exception on saving %s:%s' % (self.url, diff.rev))
             self.last_rev = diff.rev
+            self.updated_at = diff.date
+
 
         if len(diffs) > 0:
             self.save()
