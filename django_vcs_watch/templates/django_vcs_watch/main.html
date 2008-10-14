@@ -17,6 +17,8 @@
         </li>
     {% endfor %}
     </ul>
-    <a href="{% url vcs-watch-add %}">{% trans 'Watch on another repository' %}</a>
+    <div class="b-buttons">
+        <a href="{% url vcs-watch-add %}">{% trans 'Watch on another repository' %}</a>
+    </div>
 {% endblock %}
 
