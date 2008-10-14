@@ -1,0 +1,7 @@
+{% load i18n %}
+<p>{% trans 'New repository' %}: {{obj.url}}</p>
+
+<p>
+    {% url vcs-watch-repository obj.hash as view_url %}
+    {% blocktrans with obj.get_rss_url as subscribe_url %}<a href="{{view_url}}">View</a> or <a href="{{subscribe_url}}">subscribe</a>.{% endblocktrans %}
+</p>

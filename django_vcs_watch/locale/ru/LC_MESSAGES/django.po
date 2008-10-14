@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-10-09 11:11+0400\n"
+"POT-Creation-Date: 2008-10-14 18:20+0400\n"
 "PO-Revision-Date: 2008-10-07 22:30+3\n"
 "Last-Translator: Alexander Artemenko <svetlyak.40wt@gmail.com>\n"
 "Language-Team: ru <ru@li.org>\n"
@@ -141,7 +141,7 @@ msgstr "ревизия"
 msgid "added at"
 msgstr "добавлен в"
 
-#: templates/django_vcs_watch/main.html:20
+#: templates/django_vcs_watch/main.html:21
 msgid "Watch on another repository"
 msgstr "Следить за другим репозиторием"
 
@@ -219,3 +219,15 @@ msgstr ""
 msgid "You don't have watch any repositories right now."
 msgstr "Прямо сейчас вы не следите ни зи одним репозиторием."
 
+#: templates/feeds/repositories_description.html:2
+msgid "New repository"
+msgstr "Новый репозиторий"
+
+#: templates/feeds/repositories_description.html:6
+#, python-format
+msgid ""
+"<a href=\"%(view_url)s\">View</a> or <a href=\"%(subscribe_url)s"
+"\">subscribe</a>."
+msgstr ""
+"<a href=\"%(view_url)s\">Посмотреть</a> или <a href=\"%(subscribe_url)s"
+"\">подписаться</a>."
