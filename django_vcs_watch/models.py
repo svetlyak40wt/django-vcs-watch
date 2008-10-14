@@ -37,7 +37,7 @@ class Repository(models.Model):
     last_rev = models.CharField(_('Last revision'), editable=False, max_length=32)
     last_access = models.DateTimeField(_('Last access date'), editable=False, null=True)
     created_at = models.DateTimeField(_('Created at'), editable=False)
-    updated_at = models.DateTimeField(_('Updated at'), editable=False)
+    updated_at = models.DateTimeField(_('Updated at'), editable=False, null=True)
     public = models.BooleanField(
             _('Public'),
             default=True,
