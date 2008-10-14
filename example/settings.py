@@ -1,4 +1,7 @@
-import deseb
+try:
+    import deseb
+except ImportError:
+    pass
 import os.path
 
 PROJECT_ROOT = os.path.dirname(__file__)
