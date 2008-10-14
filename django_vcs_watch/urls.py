@@ -23,7 +23,7 @@ feeds = {
 main_page = {
     'template': 'django_vcs_watch/main.html',
     'extra_context': {
-        'repositories': lambda: Repository.objects.filter(public=True)[:10],
+        'repositories': lambda: Repository.objects.filter(public=True).exclude(updated_at=None)[:10],
     }
 }
 

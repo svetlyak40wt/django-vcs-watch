@@ -9,7 +9,7 @@ class LatestRepositories(Feed):
     description = _('Last updated VCS repositories')
 
     def items(self):
-        return Repository.objects.filter(public=True)[:20]
+        return Repository.objects.filter(public=True).exclude(updated_at=None)[:20]
 
     def item_pubdate(self, item):
         return item.updated_at
