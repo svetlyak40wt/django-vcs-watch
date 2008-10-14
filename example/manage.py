@@ -4,10 +4,6 @@ import logging
 
 logging.basicConfig(filename='/tmp/vcs_watch.log', level=logging.DEBUG)
 
-sys.path.append('/home/art/my-apps')
-sys.path.append('/home/art/contrib-apps')
-sys.path.append('/home/art/django-unicode')
-
 try:
     import settings # Assumed to be in the same directory.
 except ImportError:
