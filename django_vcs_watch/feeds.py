@@ -4,15 +4,15 @@ from models import Repository
 from django.utils.translation import ugettext_lazy as _
 
 class LatestRepositories(Feed):
-    title = _('Last updated repositories')
+    title = _('Last added repositories')
     link = '/vcs/'
-    description = _('Last updated VCS repositories')
+    description = _('Last added VCS repositories')
 
     def items(self):
-        return Repository.objects.filter(public=True).exclude(updated_at=None)[:20]
+        return Repository.objects.filter(public=True).exclude(updated_at=None).order_by('-created_at')[:20]
 
     def item_pubdate(self, item):
-        return item.updated_at
+        return item.created_at
 
 
 class LatestRevisions(Feed):
