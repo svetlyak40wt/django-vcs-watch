@@ -36,10 +36,24 @@ Example
 
 Example project is in the `example` directory.
 
+Options
+=======
+
+These options can be added to your settings.py:
+
+* VCS_WATCH_CHECK_INTERVAL -- Interval in minutes, to check feeds for updated.
+  In case if there is no any information about feed, it will be polled for updates
+  with this frequency. If there are two or more commits already fetched, then,
+  check interval will be interval between two latest commits, so that more actively
+  developed projects will be polled more oftenly. **Default value is 60 minutes.**
+
+* VCS_WATCH_PID_DIR -- Directory, where to story pid file for jobs.
+  **Default value is '/tmp'.**
+
 TODO
 ====
 
-* Add update scheduler instead of ugly cron job.
+* Write a short *Installation* instruction.
 * Refactor templates/django_vcs_watch/revision_detail.html and
   templates/django_vcs_watch/repository_detail.html to make
   inclusion tag for diff representation.

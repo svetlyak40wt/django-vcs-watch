@@ -9,7 +9,7 @@ class Job(BaseJob):
     help = "Update VCS feeds"
 
     def execute(self):
-        pidfile = os.path.join(getattr(settings, 'PID_DIR', '/tmp'), 'vcswatch_update_feeds.pid')
+        pidfile = os.path.join(getattr(settings, 'VCS_WATCH_PID_DIR', '/tmp'), 'vcswatch_update_feeds.pid')
         if os.path.exists(pidfile):
             pid = int(open(pidfile).read())
             if os.path.exists('/proc/%d' % pid):

@@ -5,7 +5,7 @@ import re
 import subprocess
 
 from pdb import set_trace
-from datetime import datetime
+from datetime import datetime, timedelta
 from dateutil.parser import parse as parse_date
 from dateutil.tz import tzutc
 
@@ -50,6 +50,7 @@ class Repository(models.Model):
             _('Password'), max_length=40, blank=True)
     last_error = models.TextField(_('Last error'), editable=False, null=True)
     last_error_date = models.DateTimeField(_('Last error\'s date'), editable=False, null=True)
+    last_check_at = models.DateTimeField(_('Last check\'s date'), editable=False, null=True)
 
 
     class Meta:
@@ -88,6 +89,29 @@ class Repository(models.Model):
 
     def updateFeed(self):
         logger = logging.getLogger('django_vcs_watch.repository.updateFeed')
+
+        need_to_update = True
+        interval_to_check = timedelta(0, getattr(settings, 'VCS_WATCH_CHECK_INTERVAL', 60)*60)
+
+        # don't update more often than latest commits
+        if self.last_check_at is not None:
+            latest_revisions = self.revision_set.all()[:2]
+            if len(latest_revisions) == 2:
+                rev1, rev2 = latest_revisions
+                interval_to_check = rev1.date - rev2.date
+
+            if (datetime.today() - self.last_check_at) < interval_to_check:
+                need_to_update = False
+
+        # wait for hour after error
+        elif self.last_error_date is not None and \
+             ((datetime.today() - self.last_error_date) < interval_to_check):
+             need_to_update = False
+
+        if not need_to_update:
+            logger.debug('no need to update %s' % self.hash)
+            return
+
 
         logger.debug('update %s' % self.hash)
 
@@ -166,10 +190,12 @@ class Repository(models.Model):
         if len(diffs) > 0:
             self.last_error = None
             self.last_error_date = None
-            self.save()
 
         for old_revision in self.revision_set.all()[_REVISION_LIMIT:]:
             old_revision.delete()
+
+        self.last_check_at = datetime.today()
+        self.save()
 
 
 class Revision(models.Model):
