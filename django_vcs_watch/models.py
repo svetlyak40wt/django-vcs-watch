@@ -87,7 +87,7 @@ class Repository(models.Model):
         return super(Repository, self).save()
 
     def updateFeed(self):
-        logger = logging.getLogger('django_vcs_view.repository.updateFeed')
+        logger = logging.getLogger('django_vcs_watch.repository.updateFeed')
 
         logger.debug('update %s' % self.hash)
 
