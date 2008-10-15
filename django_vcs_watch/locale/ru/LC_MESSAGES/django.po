@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-10-14 18:26+0400\n"
+"POT-Creation-Date: 2008-10-15 20:02+0400\n"
 "PO-Revision-Date: 2008-10-07 22:30+3\n"
 "Last-Translator: Alexander Artemenko <svetlyak.40wt@gmail.com>\n"
 "Language-Team: ru <ru@li.org>\n"
@@ -16,48 +16,52 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: feeds.py:7
+#: feeds.py:8
 msgid "Last added repositories"
 msgstr "Последние добавленные репозитории"
 
-#: feeds.py:9
+#: feeds.py:10
 msgid "Last added VCS repositories"
 msgstr "Последние добавленные VCS репозитории"
 
-#: feeds.py:25
+#: feeds.py:29 templates/django_vcs_watch/repository_detail.html:39
+msgid "We encounter an error during downloading diffs from this repository:"
+msgstr "Во время скачивания диффов из этого репозитория, была обнаружена ошибка:"
+
+#: feeds.py:34
 #, python-format
 msgid "Latest changes at %s"
 msgstr "Последние изменения с %s"
 
-#: models.py:35
+#: models.py:36
 msgid "Hash"
 msgstr "Хэш"
 
-#: models.py:36 templates/django_vcs_watch/repository_form.html:13
+#: models.py:37 templates/django_vcs_watch/repository_form.html:13
 msgid "URL"
 msgstr "URL"
 
-#: models.py:37
+#: models.py:38
 msgid "Last revision"
 msgstr "Последняя ревизия"
 
-#: models.py:38
+#: models.py:39
 msgid "Last access date"
 msgstr "Дата последнего доступа"
 
-#: models.py:39
+#: models.py:40
 msgid "Created at"
 msgstr "Создан в"
 
-#: models.py:40
+#: models.py:41
 msgid "Updated at"
 msgstr "Обновлен в"
 
-#: models.py:42
+#: models.py:43
 msgid "Public"
 msgstr "Публичный"
 
-#: models.py:44
+#: models.py:45
 msgid ""
 "Public repositories are show at the main page, when updated. Repositories "
 "which require authentication, can't be public."
@@ -65,56 +69,64 @@ msgstr ""
 "Обновления публичных репозиториев отображаются на главной странице. "
 "Репозитории, требующие авторизации, не могут быть публичными."
 
-#: models.py:46
+#: models.py:47
 msgid "Username"
 msgstr "Имя пользователя"
 
-#: models.py:47
+#: models.py:48
 msgid "Leave empty for anonymous access."
 msgstr "Оставьте пустым для анонимного доступа."
 
-#: models.py:49
+#: models.py:50
 msgid "Password"
 msgstr "Пароль"
 
-#: models.py:53
+#: models.py:51
+msgid "Last error"
+msgstr "Последняя ошибка"
+
+#: models.py:52
+msgid "Last error's date"
+msgstr "Дата последней ошибки"
+
+#: models.py:56
 msgid "Repository"
 msgstr "Репозиторий"
 
-#: models.py:54
+#: models.py:57
 msgid "Repositories"
 msgstr "Репозитории"
 
-#: models.py:59
+#: models.py:62
 #, python-format
 msgid "Repository at %s"
 msgstr "Репозиторий %s"
 
-#: models.py:170 templates/django_vcs_watch/repository_detail.html:27
+#: models.py:177 templates/django_vcs_watch/repository_detail.html:28
 #: templates/django_vcs_watch/revision_detail.html:13
 #: templates/django_vcs_watch/revision_detail.html:19
 msgid "Revision"
 msgstr "Ревизия"
 
-#: models.py:171 templates/django_vcs_watch/repository_detail.html:29
+#: models.py:178 templates/django_vcs_watch/repository_detail.html:30
 #: templates/django_vcs_watch/revision_detail.html:21
 msgid "Author"
 msgstr "Автор"
 
-#: models.py:172 templates/django_vcs_watch/repository_detail.html:28
+#: models.py:179 templates/django_vcs_watch/repository_detail.html:29
 #: templates/django_vcs_watch/revision_detail.html:20
 msgid "Date"
 msgstr "Дата"
 
-#: models.py:173
+#: models.py:180
 msgid "Message"
 msgstr "Сообщение"
 
-#: models.py:174
+#: models.py:181
 msgid "Diff"
 msgstr "Diff"
 
-#: models.py:177
+#: models.py:184
 #, python-format
 msgid "Revision %(rev)s by %(author)s"
 msgstr "Ревизия %(rev)s от %(author)s"
@@ -145,30 +157,25 @@ msgstr "добавлен в"
 msgid "Watch on another repository"
 msgstr "Следить за другим репозиторием"
 
-#: templates/django_vcs_watch/repository_detail.html:15
-#: templates/django_vcs_watch/repository_detail.html:19
+#: templates/django_vcs_watch/repository_detail.html:16
+#: templates/django_vcs_watch/repository_detail.html:20
 msgid "Last changes from"
 msgstr "Последние изменения с"
 
-#: templates/django_vcs_watch/repository_detail.html:37
+#: templates/django_vcs_watch/repository_detail.html:42
 msgid "Please, wait while we download all diffs for this repository."
 msgstr ""
 "Пожалуйста. подождите, пока будут выкачаны диффы для этого репозитория."
 
-#: templates/django_vcs_watch/repository_detail.html:40
+#: templates/django_vcs_watch/repository_detail.html:45
 #, python-format
 msgid ""
-"\n"
-"        Now you can <a href=\"%(rss)s\"> subscribe on RSS feed</a>, to "
-"receive all updated in time. Or <a href=\"%(add_url)s\">add another "
-"repository</a>.\n"
-"        "
+"Now you can <a href=\"%(rss)s\"> subscribe on RSS feed</a>, to receive all "
+"updated in time. Or <a href=\"%(add_url)s\">add another repository</a>."
 msgstr ""
-"\n"
-"        Теперь вы можете <a href=\"%(rss)s\"> подписаться на RSS фид</a>, "
+"Теперь вы можете <a href=\"%(rss)s\"> подписаться на RSS фид</a>, "
 "чтобы вовремя получать все обновления. Или <a href=\"%(add_url)s\">добавить "
-"другой репозиторий</a>.\n"
-"        "
+"другой репозиторий</a>."
 
 #: templates/django_vcs_watch/repository_form.html:4
 msgid "Watch on repository"

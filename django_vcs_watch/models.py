@@ -2,6 +2,7 @@ import os
 import uuid
 import logging
 import re
+import subprocess
 
 from pdb import set_trace
 from datetime import datetime
@@ -47,6 +48,8 @@ class Repository(models.Model):
             help_text=_('Leave empty for anonymous access.'))
     password = EncryptedCharField(
             _('Password'), max_length=40, blank=True)
+    last_error = models.TextField(_('Last error'), editable=False, null=True)
+    last_error_date = models.DateTimeField(_('Last error\'s date'), editable=False, null=True)
 
 
     class Meta:
@@ -88,37 +91,39 @@ class Repository(models.Model):
 
         logger.debug('update %s' % self.hash)
 
-        options = {
-            'url': self.url,
-            'rev':'', 'limit':'', 'username':'', 'password':''
-        }
+        command = ['svn', 'log', '--non-interactive']
 
         if self.last_rev:
-            options['rev'] = ' -r HEAD:%s ' % self.last_rev
+            command += ['-r', 'HEAD:%s' % self.last_rev]
 
         if _REVISION_LIMIT:
-            options['limit'] = ' --limit %s ' % _REVISION_LIMIT
+            command += ['--limit', '%s' % _REVISION_LIMIT]
 
         if self.username:
-            options['username'] = ' --username \'%s\' ' % self.username
+            command += ['--username', self.username]
 
         if self.password:
-            options['password'] = ' --password \'%s\' ' % self.password
+            command += ['--password', self.password]
 
-        command = 'svn log --non-interactive %(limit)s%(rev)s%(username)s%(password)s --xml %(url)s' % options
+        command += ['--xml', self.url]
 
-        logger.debug(re.sub(r"--password '.*'", "--password 'xxxxx'", command))
+        logger.debug(re.sub(r"--password '.*'", "--password 'xxxxx'", ' '.join(command)))
 
-        in_, out_ = os.popen2(command)
+        svn = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        xml, stderr = svn.communicate()
 
-        xml = out_.read()
-        if not xml:
+        if svn.returncode != 0 or stderr or not xml:
+            logger.error('svn command failed with code %d and message %r' % (svn.returncode, stderr))
+            self.last_error = '<br />'.join(stderr.splitlines())
+            self.last_error_date = datetime.today()
+            self.save()
             return
 
         try:
             xml_e = ET.fromstring(xml)
         except Exception, e:
             logger.error(e)
+            logger.error(xml)
             return
 
         diffs = []
@@ -159,6 +164,8 @@ class Repository(models.Model):
 
 
         if len(diffs) > 0:
+            self.last_error = None
+            self.last_error_date = None
             self.save()
 
         for old_revision in self.revision_set.all()[_REVISION_LIMIT:]:
