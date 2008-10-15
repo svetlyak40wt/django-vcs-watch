@@ -1,13 +1,12 @@
 Django VCS Watch
-================
+----------------
 
 This is a django application which serve as RSS proxy for different VCSs.
 
 Dependencies
 ============
 
-Required
---------
+### Required ###
 
 **django_globals** is required to automatic update of the 'user' field.
 
@@ -26,14 +25,22 @@ it have it's own dependencies, for example, from django-pycrypto.
 Under *debian* like systems, just do `sudo apt-get install python-dateutil`
 
 
-Optional
---------
+### Optional ###
 
 There are some test templates in the templates/django_vcs_watch.
 They use modified 'Colorize' filter by [Will Larson](http://lethain.com/author/will-larson/),
 but you can use another colorizer in your own templates.
 
 Example
--------
+=======
 
 Example project is in the `example` directory.
+
+TODO
+====
+
+* Add update scheduler instead of ugly cron job.
+* Refactor templates/django_vcs_watch/revision_detail.html and
+  templates/django_vcs_watch/repository_detail.html to make
+  inclusion tag for diff representation.
+* Add pretty css for example.
