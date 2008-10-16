@@ -54,6 +54,10 @@ TODO
 ====
 
 * Write a short *Installation* instruction.
+* Add check for valid and accessible URL before add it to database.
+* Add check if URL already added and if it is public, then offer it to the user
+  instead of new repository creation.
+* Add ability to edit or remove Repository.
 * Refactor templates/django_vcs_watch/revision_detail.html and
   templates/django_vcs_watch/repository_detail.html to make
   inclusion tag for diff representation.
