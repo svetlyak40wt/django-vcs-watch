@@ -87,6 +87,7 @@ class Repository(models.Model):
 
         return super(Repository, self).save()
 
+
     def updateFeed(self):
         logger = logging.getLogger('django_vcs_watch.repository.updateFeed')
 
@@ -160,10 +161,11 @@ class Repository(models.Model):
             msg = entry_e.find('msg').text
             date = parse_date(entry_e.find('date').text).astimezone(tzutc())
 
-            logger.debug('fetching revision %s by %s' % (revision, author))
+            command = ['svn', 'diff', '-c', str(revision), self.url]
+            logger.debug('fetching diff: %r' % ' '.join(command))
 
-            in_, out_ = os.popen2('svn diff -c %s %s' % (revision, self.url))
-            diff = out_.read()
+            svn = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            diff, stderr = svn.communicate()
 
             diffs.append( Revision(repos = self,
                                rev = revision,
