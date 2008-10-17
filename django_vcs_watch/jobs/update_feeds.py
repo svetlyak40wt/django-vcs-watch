@@ -9,11 +9,12 @@ class Job(BaseJob):
     help = "Update VCS feeds"
 
     def execute(self):
+        _log = logging.getLogger('django_vcs_watch.jobs.update_feeds')
+
         pidfile = os.path.join(getattr(settings, 'VCS_WATCH_PID_DIR', '/tmp'), 'vcswatch_update_feeds.pid')
         if os.path.exists(pidfile):
             pid = int(open(pidfile).read())
             if os.path.exists('/proc/%d' % pid):
-                _log = logging.getLogger('django_vcs_watch.jobs.update_feeds')
                 _log.warning('Job already running with pid %d' % pid)
                 return
 
@@ -24,7 +25,10 @@ class Job(BaseJob):
             f.close()
 
         for repos in Repository.objects.all():
-            repos.updateFeed()
+            try:
+                repos.updateFeed()
+            except Exeception, e:
+                _log.error(e)
 
         os.remove(pidfile)
 
