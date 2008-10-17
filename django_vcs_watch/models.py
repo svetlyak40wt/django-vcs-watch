@@ -15,7 +15,7 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import DjangoUnicodeDecodeError
+from django.utils.encoding import DjangoUnicodeDecodeError, force_unicode
 
 from django_fields.fields import EncryptedCharField
 
@@ -27,6 +27,18 @@ if 'django_globals' not in settings.INSTALLED_APPS:
 
 if 'django_globals.middleware.User' not in settings.MIDDLEWARE_CLASSES:
     raise Exception('Please, add django_globals.middleware.User to the MIDDLEWARE_CLASSES.')
+
+def guess_encoding(s):
+    options = [
+        {}, {'encoding': 'cp1251'}, {'encoding': 'koi8-r'},
+        {'encoding': 'utf-8', 'errors': 'ignore'}
+    ]
+    for o in options:
+        try:
+            return force_unicode(s, **o)
+        except DjangoUnicodeDecodeError:
+            pass
+    raise Exception('Can\'t decode string: %r' % s)
 
 def strip_timezone(t):
     return datetime(t.year, t.month, t.day, t.hour, t.minute, t.second, t.microsecond)
@@ -101,6 +113,7 @@ class Repository(models.Model):
                 rev1, rev2 = latest_revisions
                 interval_to_check = rev1.date - rev2.date
 
+            logger.debug('interval to check %r, last_check %r' % (interval_to_check, self.last_check_at))
             if (datetime.today() - self.last_check_at) < interval_to_check:
                 need_to_update = False
 
@@ -169,8 +182,8 @@ class Repository(models.Model):
 
             diffs.append( Revision(repos = self,
                                rev = revision,
-                               diff=diff,
-                               message=msg or '',
+                               diff=guess_encoding(diff),
+                               message=msg or u'',
                                date=strip_timezone(date),
                                author=author
                                )
