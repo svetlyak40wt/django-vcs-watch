@@ -21,6 +21,7 @@
 
 {% block content %}
     {{block.super}}
+    {{object.update_last_access}}
     {% if object.revision_set.count %}
         <ul class="revisions">
         {% for diff in object.revision_set.all %}

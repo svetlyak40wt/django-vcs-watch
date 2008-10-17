@@ -74,6 +74,11 @@ class Repository(models.Model):
     def __unicode__(self):
         return _('Repository at %s') % self.url
 
+    def update_last_access(self):
+        self.last_access = datetime.today()
+        self.save()
+        return ''
+
     @models.permalink
     def get_absolute_url(self):
         return ('vcs-watch-repository', (), {'slug': self.hash})
