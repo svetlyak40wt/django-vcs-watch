@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 
 class LatestRepositories(Feed):
     title = _('Last updated repositories')
+    # TODO reverse
     link = '/vcs/'
     description = _('Last updated VCS repositories')
 
