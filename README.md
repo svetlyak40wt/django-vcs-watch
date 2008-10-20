@@ -1,13 +1,12 @@
 Django VCS Watch
-================
+----------------
 
 This is a django application which serve as RSS proxy for different VCSs.
 
 Dependencies
 ============
 
-Required
---------
+### Required ###
 
 **django_globals** is required to automatic update of the 'user' field.
 
@@ -26,14 +25,40 @@ it have it's own dependencies, for example, from django-pycrypto.
 Under *debian* like systems, just do `sudo apt-get install python-dateutil`
 
 
-Optional
---------
+### Optional ###
 
 There are some test templates in the templates/django_vcs_watch.
 They use modified 'Colorize' filter by [Will Larson](http://lethain.com/author/will-larson/),
 but you can use another colorizer in your own templates.
 
 Example
--------
+=======
 
 Example project is in the `example` directory.
+
+Options
+=======
+
+These options can be added to your settings.py:
+
+* VCS_WATCH_CHECK_INTERVAL -- Interval in minutes, to check feeds for updated.
+  In case if there is no any information about feed, it will be polled for updates
+  with this frequency. If there are two or more commits already fetched, then,
+  check interval will be interval between two latest commits, so that more actively
+  developed projects will be polled more oftenly. **Default value is 60 minutes.**
+
+* VCS_WATCH_PID_DIR -- Directory, where to story pid file for jobs.
+  **Default value is '/tmp'.**
+
+TODO
+====
+
+* Write a short *Installation* instruction.
+* Add check for valid and accessible URL before add it to database.
+* Add check if URL already added and if it is public, then offer it to the user
+  instead of new repository creation.
+* Add ability to edit or remove Repository.
+* Refactor templates/django_vcs_watch/revision_detail.html and
+  templates/django_vcs_watch/repository_detail.html to make
+  inclusion tag for diff representation.
+* Add pretty css for example.

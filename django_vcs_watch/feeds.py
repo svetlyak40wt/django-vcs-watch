@@ -2,25 +2,36 @@ from django.contrib.syndication.feeds import FeedDoesNotExist, Feed
 from django.core.exceptions import ObjectDoesNotExist
 from models import Repository
 from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import string_concat
 
 class LatestRepositories(Feed):
-    title = _('Last updated repositories')
+    title = _('Last added repositories')
     # TODO reverse
     link = '/vcs/'
-    description = _('Last updated VCS repositories')
+    description = _('Last added VCS repositories')
 
     def items(self):
-        return Repository.objects.filter(public=True)[:20]
+        return Repository.objects.filter(public=True).exclude(updated_at=None).order_by('-created_at')[:20]
 
     def item_pubdate(self, item):
-        return item.updated_at
+        return item.created_at
 
 
 class LatestRevisions(Feed):
     def get_object(self, bits):
         if len(bits) != 1:
             raise ObjectDoesNotExist
-        return Repository.objects.get(hash__exact=bits[0])
+        repository = Repository.objects.get(hash__exact=bits[0])
+        repository.update_last_access()
+        return repository
+
+    def description(self, obj):
+        if obj.last_error is not None:
+            return string_concat(
+                '<b>',
+                _('We encounter an error during downloading diffs from this repository:'),
+                '</b><br />',
+                obj.last_error)
 
     def title(self, obj):
         return _('Latest changes at %s') % obj.url

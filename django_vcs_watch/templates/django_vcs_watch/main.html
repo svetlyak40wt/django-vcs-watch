@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n humanize %}
 
 {% block headline %}{% block title %}{% if repositories %}{% trans 'Latest public repositories' %}{% else %}{% trans 'There is no public repositories right now' %}{% endif %}{% endblock %}{% endblock %}
 
@@ -9,13 +9,16 @@
         <li>
             <a href="{% url vcs-watch-repository repository.hash %}">{{repository.url}}</a>
             {% if repository.last_rev %}
-                {% trans 'updated at' %} {{repository.updated_at}}, {% trans 'revision' %} {{repository.last_rev}}
+                {% blocktrans with repository.updated_at|naturalday as updated_at %}updated at {{updated_at}}{% endblocktrans %},
+                {% trans 'revision' %} {{repository.last_rev}}
             {% else %}
                 {% trans 'added at' %} {{repository.created_at}}
             {% endif %}
         </li>
     {% endfor %}
     </ul>
-    <a href="{% url vcs-watch-add %}">{% trans 'Add new watch' %}</a>
+    <div class="b-buttons">
+        <a href="{% url vcs-watch-add %}">{% trans 'Watch on another repository' %}</a>
+    </div>
 {% endblock %}
 

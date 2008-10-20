@@ -14,9 +14,7 @@ def revision(request, repository_hash, revision):
             slug_field='rev')
 
 @login_required
-def user(request, username):
-    if request.user.username != username:
-        return HttpResponseForbidden()
+def profile(request):
     return object_list(
             request,
             queryset=request.user.repository_set.all())

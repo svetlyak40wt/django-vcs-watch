@@ -8,11 +8,12 @@
     span.rev, span.date, span.author {float: left; right-padding: 2em; margin-right:1em;}
     p.message {clear: left; margin-top: 2em; background-color: lightgray;}
     .highlight {overflow: hidden;}
+    .b-errors {background: pink;}
 {% endblock %}
 
 {% block head %}
     {{ block.super }}
-    <link rel="alternate" type="application/rss+xml" title="RSS" href="{{object.get_rss_url}}" />
+    <link rel="alternate" type="application/rss+xml" title="{% trans 'Last changes from' %} {{object.url}}, RSS" href="{{object.get_rss_url}}" />
 {% endblock %}
 
 
@@ -20,6 +21,7 @@
 
 {% block content %}
     {{block.super}}
+    {{object.update_last_access}}
     {% if object.revision_set.count %}
         <ul class="revisions">
         {% for diff in object.revision_set.all %}
@@ -34,12 +36,15 @@
         {% endfor %}
         </ul>
     {% else %}
-        <h2>{% trans 'Please, wait while we download all diffs for this repository.' %}</h2>
-        <p>
-        {% url vcs-watch-add as add_url %}
-        {% blocktrans with object.get_rss_url as rss %}
-        Now you can <a href="{{rss}}"> subscribe on RSS feed</a>, to receive all updated in time. Or <a href="{{add_url}}">add another repository</a>.
-        {% endblocktrans %}
+        {% if object.last_error %}
+            <p class="b-errors">{% trans 'We encounter an error during downloading diffs from this repository:' %}</p>
+            <pre>{{object.last_error|safe}}</pre>
+        {% else %}
+            <p>{% trans 'Please, wait while we download all diffs for this repository.' %}</p>
+            <p>
+            {% url vcs-watch-add as add_url %}
+            {% blocktrans with object.get_rss_url as rss %}Now you can <a href="{{rss}}"> subscribe on RSS feed</a>, to receive all updated in time. Or <a href="{{add_url}}">add another repository</a>.{% endblocktrans %}
+        {% endif %}
         </p>
     {% endif %}
 {% endblock %}

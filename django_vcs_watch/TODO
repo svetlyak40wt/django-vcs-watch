@@ -1,8 +1,0 @@
-TODO
-====
-
-* Refactor templates/django_vcs_watch/revision_detail.html and
-  templates/django_vcs_watch/repository_detail.html to make
-  inclusion tag for diff representation.
-* Add translation into russian.
-* Add pretty css for example.

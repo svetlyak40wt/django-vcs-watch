@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 import sys
+import os
 import logging
 
-logging.basicConfig(filename='/tmp/vcs_watch.log', level=logging.DEBUG)
-
-sys.path.append('/home/art/my-apps')
-sys.path.append('/home/art/contrib-apps')
-sys.path.append('/home/art/django-unicode')
+logging.basicConfig(
+    filename=os.path.join(os.path.dirname(__file__), 'example.log'),
+    level=logging.DEBUG,
+    format='%(asctime)s %(levelname)s %(name)s %(pathname)s:%(lineno)d %(message)s',
+    )
 
 try:
     import settings # Assumed to be in the same directory.

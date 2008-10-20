@@ -23,7 +23,7 @@ feeds = {
 main_page = {
     'template': 'django_vcs_watch/main.html',
     'extra_context': {
-        'repositories': lambda: Repository.objects.filter(public=True)[:10],
+        'repositories': lambda: Repository.objects.filter(public=True).exclude(updated_at=None)[:10],
     }
 }
 
@@ -40,7 +40,7 @@ urlpatterns = patterns('django.views.generic',
 
 urlpatterns += patterns('django_vcs_watch.views',
    (r'^(?P<repository_hash>[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})/(?P<revision>[a-z0-9-]{1,36})/$', 'revision', {}, 'vcs-watch-revision'),
-   (r'^user/(?P<username>\w+)/$', 'user', {}, 'vcs-watch-user'),
+   (r'^profile/$', 'profile', {}, 'vcs-watch-profile'),
 )
 
 urlpatterns += patterns('django.contrib.syndication.views',
