@@ -6,6 +6,7 @@ from django.utils.translation import string_concat
 
 class LatestRepositories(Feed):
     title = _('Last added repositories')
+    # TODO reverse
     link = '/vcs/'
     description = _('Last added VCS repositories')
 

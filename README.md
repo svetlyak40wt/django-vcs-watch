@@ -10,15 +10,15 @@ Dependencies
 
 **django_globals** is required to automatic update of the 'user' field.
 
-To install django_globals, download sources from a repository
-<http://github.com/svetlyak40wt/dajngo-globals/> and install
-package django_globals somewhere in your python path.
+To install `django_globals`, download sources from a repository
+<http://github.com/svetlyak40wt/django-globals/> and install
+package `django_globals` somewhere in your python path.
 
-Then, add 'django_globals' in to the INSTALLED_APPS, and add
-'django_globals.middleware.User' into the MIDDLEWARE_CLASSES.
+Then, add `django_globals` in to the `INSTALLED_APPS`, and add
+`django_globals.middleware.User` into the `MIDDLEWARE_CLASSES`.
 
 **django_fields** required for encrypted passwords and authentication.
-You can find it at <http://github.com/svetlyak40wt/dajngo-fields>, also,
+You can find it at <http://github.com/svetlyak40wt/django-fields>, also,
 it have it's own dependencies, for example, from django-pycrypto.
 
 **python-dateutil** this package used to parse ISO dates.
@@ -27,7 +27,7 @@ Under *debian* like systems, just do `sudo apt-get install python-dateutil`
 
 ### Optional ###
 
-There are some test templates in the templates/django_vcs_watch.
+There are some test templates in the `templates/django_vcs_watch`.
 They use modified 'Colorize' filter by [Will Larson](http://lethain.com/author/will-larson/),
 but you can use another colorizer in your own templates.
 
@@ -41,13 +41,13 @@ Options
 
 These options can be added to your settings.py:
 
-* VCS_WATCH_CHECK_INTERVAL -- Interval in minutes, to check feeds for updated.
+* `VCS_WATCH_CHECK_INTERVAL` -- Interval in minutes, to check feeds for updated.
   In case if there is no any information about feed, it will be polled for updates
   with this frequency. If there are two or more commits already fetched, then,
   check interval will be interval between two latest commits, so that more actively
   developed projects will be polled more oftenly. **Default value is 60 minutes.**
 
-* VCS_WATCH_PID_DIR -- Directory, where to story pid file for jobs.
+* `VCS_WATCH_PID_DIR` -- Directory, where to story pid file for jobs.
   **Default value is '/tmp'.**
 
 TODO
@@ -58,7 +58,7 @@ TODO
 * Add check if URL already added and if it is public, then offer it to the user
   instead of new repository creation.
 * Add ability to edit or remove Repository.
-* Refactor templates/django_vcs_watch/revision_detail.html and
-  templates/django_vcs_watch/repository_detail.html to make
+* Refactor `templates/django_vcs_watch/revision_detail.html` and
+  `templates/django_vcs_watch/repository_detail.html` to make
   inclusion tag for diff representation.
 * Add pretty css for example.
