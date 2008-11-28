@@ -27,7 +27,7 @@ class Job(BaseJob):
         for repos in Repository.objects.all():
             try:
                 repos.updateFeed()
-            except Exeception, e:
+            except Exception, e:
                 _log.error(e)
 
         os.remove(pidfile)
