@@ -2,3 +2,5 @@
 *.pyc
 *.db
 *.log
+*.egg-info
+dist

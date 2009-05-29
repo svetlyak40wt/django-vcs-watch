@@ -1,0 +1,11 @@
+Changes in django-vcs-watch
+===========================
+
+0.1.2
+-----
+
+* Fixed setup.py.
+
+0.1.1
+
+* First public release.
