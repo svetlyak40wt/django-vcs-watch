@@ -1,11 +1,11 @@
 import os
 import logging
 
-from django_extensions.management.jobs import BaseJob
+from django_extensions.management.jobs import HourlyJob
 from django_vcs_watch.models import Repository
 from django.conf import settings
 
-class Job(BaseJob):
+class Job(HourlyJob):
     help = "Update VCS feeds"
 
     def execute(self):

@@ -1,6 +1,11 @@
 Changes in django-vcs-watch
 ===========================
 
+0.1.4
+-----
+
+* Job was moved to 'hourly'.
+
 0.1.3
 -----
 
