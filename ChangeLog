@@ -1,6 +1,11 @@
 Changes in django-vcs-watch
 ===========================
 
+0.1.3
+-----
+
+* Added flag 'zip_safe = False' to allow django-extensions discover jobs.
+
 0.1.2
 -----
 
