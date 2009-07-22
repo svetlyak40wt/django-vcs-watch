@@ -28,7 +28,7 @@ class Job(HourlyJob):
             try:
                 repos.updateFeed()
             except Exception, e:
-                _log.error(e)
+                _log.exception("can't update feed for repo %s" % repos)
 
         os.remove(pidfile)
 
