@@ -53,6 +53,11 @@ These options can be added to your settings.py:
 TODO
 ====
 
+* Make settings to enable "public only" mode, when only public repositories are available
+  and no registration is required.
+* Add ability to supply settings with URL rewriter, to change https to svn+ssh, for example.
+* Choose check interval, based on time between recent commits but no less then interval,
+  given in settings.
 * Write a short *Installation* instruction.
 * Add check for valid and accessible URL before add it to database.
 * Add check if URL already added and if it is public, then offer it to the user
