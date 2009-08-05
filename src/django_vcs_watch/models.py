@@ -46,7 +46,7 @@ def strip_timezone(t):
 class Repository(models.Model):
     user = models.ForeignKey(User, editable=False, blank=True, null=True)
     hash = models.CharField(_('Hash'), editable=False, max_length=36)
-    url = models.URLField(_('URL'), verify_exists=False)
+    url = models.CharField(_('URL'), max_length=255)
     last_rev = models.CharField(_('Last revision'), editable=False, max_length=32)
     last_access = models.DateTimeField(_('Last access date'), editable=False, null=True)
     created_at = models.DateTimeField(_('Created at'), editable=False)
