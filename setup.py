@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = 'django-vcs-watch',
-    version = '0.1.4',
+    version = '0.1.5pre',
     description = 'RSS proxy for different VCS/DVCS.',
     keywords = 'django apps svn',
     license = 'New BSD License',

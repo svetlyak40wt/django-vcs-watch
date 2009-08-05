@@ -50,11 +50,11 @@ These options can be added to your settings.py:
 * `VCS_WATCH_PID_DIR` -- Directory, where to story pid file for jobs.
   **Default value is '/tmp'.**
 
+* `VCS_ONLY_PUBLIC_REPS` -- Set to True if you want only public repositories online.
+
 TODO
 ====
 
-* Make settings to enable "public only" mode, when only public repositories are available
-  and no registration is required.
 * Add ability to supply settings with URL rewriter, to change https to svn+ssh, for example.
 * Choose check interval, based on time between recent commits but no less then interval,
   given in settings.
