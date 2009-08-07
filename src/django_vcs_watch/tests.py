@@ -7,7 +7,7 @@ from models import Repository
 
 from pdb import set_trace
 
-class Repositories(TestCase):
+class _RepsTestCase(TestCase):
     def setUp(self):
         try:
             self.tester = User.objects.get(username='tester')
@@ -18,24 +18,15 @@ class Repositories(TestCase):
         self.login_url = reverse('vcs-watch-add')
 
         Repository.objects.all().delete()
-        super(Repositories, self).setUp()
+        super(_RepsTestCase, self).setUp()
 
+class Repositories(_RepsTestCase):
     def testGetAnonymousForm(self):
         response = self.client.get(self.add_url)
         self.assertEqual(200, response.status_code)
         self.assertContains(response, 'id_url')
         self.assertNotContains(response, 'id_public')
         self.assertNotContains(response, 'id_username')
-
-    def testGetNonAnonymousForm(self):
-        self.assert_(self.client.login(username='tester', password='test'))
-
-        response = self.client.get(self.add_url)
-        self.assertEqual(200, response.status_code)
-        self.assertContains(response, 'id_url')
-        self.assertContains(response, 'id_public')
-        self.assertContains(response, 'id_username')
-        self.assertContains(response, 'id_password')
 
     def testAddRepByAnonymous(self):
         url = 'http://svn.example.com/trunk/'
@@ -48,6 +39,17 @@ class Repositories(TestCase):
 
         url = reverse('vcs-watch-repository', kwargs = dict(slug=reps[0].hash))
         self.assertRedirects(response, url)
+
+class PrivateRepositories(_RepsTestCase):
+    def testGetNonAnonymousForm(self):
+        self.assert_(self.client.login(username='tester', password='test'))
+
+        response = self.client.get(self.add_url)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, 'id_url')
+        self.assertContains(response, 'id_public')
+        self.assertContains(response, 'id_username')
+        self.assertContains(response, 'id_password')
 
     def testAddByAuthorized(self):
         self.assert_(self.client.login(username='tester', password='test'))
@@ -87,3 +89,11 @@ class Repositories(TestCase):
 
         for hash in hashes:
             self.assertContains(response, hash)
+
+
+
+class Utils(TestCase):
+    def testRewrites(self):
+        from django_vcs_watch.utils import to_svn_ssh
+        self.assertEqual('svn+ssh://svn.example.com/test', to_svn_ssh('svn+ssh://svn.example.com/test'))
+

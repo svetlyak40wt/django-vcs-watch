@@ -1,6 +1,6 @@
 from django import forms
 from models import Repository
-from django.conf import settings
+from django_vcs_watch.settings import *
 
 class PrivateRepositoryForm(forms.ModelForm):
     password = forms.CharField(
@@ -16,9 +16,7 @@ class PublicRepositoryForm(forms.ModelForm):
         model = Repository
         fields = ('url', )
 
-PUBLIC = getattr(settings, 'VCS_ONLY_PUBLIC_REPS', False)
-
-if PUBLIC:
+if VCS_ONLY_PUBLIC_REPS:
     RepositoryForm = PublicRepositoryForm
 else:
     RepositoryForm = PrivateRepositoryForm
