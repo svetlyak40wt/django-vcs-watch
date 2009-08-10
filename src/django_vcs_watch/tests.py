@@ -3,7 +3,8 @@ from django.test.client import Client
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 
-from models import Repository
+from django_vcs_watch.models import Repository
+from django_vcs_watch.settings import VCS_ONLY_PUBLIC_REPS
 
 from pdb import set_trace
 
@@ -40,55 +41,56 @@ class Repositories(_RepsTestCase):
         url = reverse('vcs-watch-repository', kwargs = dict(slug=reps[0].hash))
         self.assertRedirects(response, url)
 
-class PrivateRepositories(_RepsTestCase):
-    def testGetNonAnonymousForm(self):
-        self.assert_(self.client.login(username='tester', password='test'))
+if not VCS_ONLY_PUBLIC_REPS:
+    class PrivateRepositories(_RepsTestCase):
+        def testGetNonAnonymousForm(self):
+            self.assert_(self.client.login(username='tester', password='test'))
 
-        response = self.client.get(self.add_url)
-        self.assertEqual(200, response.status_code)
-        self.assertContains(response, 'id_url')
-        self.assertContains(response, 'id_public')
-        self.assertContains(response, 'id_username')
-        self.assertContains(response, 'id_password')
+            response = self.client.get(self.add_url)
+            self.assertEqual(200, response.status_code)
+            self.assertContains(response, 'id_url')
+            self.assertContains(response, 'id_public')
+            self.assertContains(response, 'id_username')
+            self.assertContains(response, 'id_password')
 
-    def testAddByAuthorized(self):
-        self.assert_(self.client.login(username='tester', password='test'))
-        url = 'http://svn.example.com/trunk/'
-        response = self.client.post(self.add_url, dict(
-                                        url=url,
-                                        username='svnuser',
-                                        password='svnpass',
-                                        ))
-
-        reps = Repository.objects.all()
-        self.assertEqual(1, len(reps))
-        self.assertEqual(url, reps[0].url)
-        self.assertEqual(False, reps[0].public)
-        self.assertEqual('svnuser', reps[0].username)
-        self.assertEqual('svnpass', reps[0].password)
-
-        url = reverse('vcs-watch-repository', kwargs = dict(slug=reps[0].hash))
-        self.assertRedirects(response, url)
-
-    def testPrivateReposList(self):
-        self.assert_(self.client.login(username='tester', password='test'))
-
-        url = 'http://svn.example.com/trunk/'
-        hashes = []
-        for i in xrange(10):
+        def testAddByAuthorized(self):
+            self.assert_(self.client.login(username='tester', password='test'))
+            url = 'http://svn.example.com/trunk/'
             response = self.client.post(self.add_url, dict(
                                             url=url,
                                             username='svnuser',
                                             password='svnpass',
                                             ))
-            hashes.append(response.get('Location', None).split('/')[-2])
 
-        user_url = reverse('vcs-watch-profile')
-        response = self.client.get(user_url)
-        self.assertEqual(200, response.status_code)
+            reps = Repository.objects.all()
+            self.assertEqual(1, len(reps))
+            self.assertEqual(url, reps[0].url)
+            self.assertEqual(False, reps[0].public)
+            self.assertEqual('svnuser', reps[0].username)
+            self.assertEqual('svnpass', reps[0].password)
 
-        for hash in hashes:
-            self.assertContains(response, hash)
+            url = reverse('vcs-watch-repository', kwargs = dict(slug=reps[0].hash))
+            self.assertRedirects(response, url)
+
+        def testPrivateReposList(self):
+            self.assert_(self.client.login(username='tester', password='test'))
+
+            url = 'http://svn.example.com/trunk/'
+            hashes = []
+            for i in xrange(10):
+                response = self.client.post(self.add_url, dict(
+                                                url=url,
+                                                username='svnuser',
+                                                password='svnpass',
+                                                ))
+                hashes.append(response.get('Location', None).split('/')[-2])
+
+            user_url = reverse('vcs-watch-profile')
+            response = self.client.get(user_url)
+            self.assertEqual(200, response.status_code)
+
+            for hash in hashes:
+                self.assertContains(response, hash)
 
 
 
