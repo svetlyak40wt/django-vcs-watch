@@ -11,11 +11,12 @@ class Job(HourlyJob):
     def execute(self):
         _log = logging.getLogger('django_vcs_watch.jobs.update_feeds')
 
-        pidfile = os.path.join(getattr(settings, 'VCS_WATCH_PID_DIR', '/tmp'), 'vcswatch_update_feeds.pid')
+        pidfile = getattr(settings, 'VCS_WATCH_PID_FILE', '/tmp/vcswatch_update_feeds.pid')
+
         if os.path.exists(pidfile):
             pid = int(open(pidfile).read())
             if os.path.exists('/proc/%d' % pid):
-                _log.warning('Job already running with pid %d' % pid)
+                _log.warning('Job already running with pid %d (pidfile "%s" exists)' % (pid, pidfile))
                 return
 
         f = open(pidfile, 'w')
