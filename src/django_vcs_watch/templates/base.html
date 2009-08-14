@@ -1,11 +1,11 @@
 <html>
     <head>
         <style>{% block style %}{% endblock %}</style>
-        <title>{% block title %}{% endblock %}</title>
+        <title>{% block html-head-title %}{{ title }}{% endblock %}</title>
         {% block head %}{% endblock %}
     </head>
     <body>
-        {% block full_headline %}<h1>{% block headline %}{% endblock %}{% endblock %}
+        {% block content-title %}<h2 class="title">{% block content-title-inner %}{{ title }}{% endblock %}</h2>{% endblock %}
         {% block content %}{% endblock %}
     </body>
 </html>

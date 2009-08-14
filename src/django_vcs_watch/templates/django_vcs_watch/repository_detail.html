@@ -1,23 +1,13 @@
 {% extends 'base.html' %}
 {% load i18n syntax_color %}
 
-{% block style %}
-    {{block.super}}
-    {% pygments_css %}
-    ul.revisions li {border-top: 2px solid black; list-style: none;}
-    span.rev, span.date, span.author {float: left; right-padding: 2em; margin-right:1em;}
-    p.message {clear: left; margin-top: 2em; background-color: lightgray;}
-    .highlight {overflow: hidden;}
-    .b-errors {background: pink;}
-{% endblock %}
-
 {% block head %}
     {{ block.super }}
     <link rel="alternate" type="application/rss+xml" title="{% trans 'Last changes from' %} {{object.url}}, RSS" href="{{object.get_rss_url}}" />
 {% endblock %}
 
 
-{% block headline %}{% block title %}{% trans 'Last changes from' %} {{object.url}}{% endblock %}{% endblock %}
+{% block content-title-inner %}{% block title %}{% trans 'Last changes from' %} {{object.url}}{% endblock %}{% endblock %}
 
 {% block content %}
     {{block.super}}
@@ -37,7 +27,7 @@
         </ul>
     {% else %}
         {% if object.last_error %}
-            <p class="b-errors">{% trans 'We encounter an error during downloading diffs from this repository:' %}</p>
+            <p>{% trans 'We encounter an error during downloading diffs from this repository:' %}</p>
             <pre>{{object.last_error|safe}}</pre>
         {% else %}
             <p>{% trans 'Please, wait while we download all diffs for this repository.' %}</p>
