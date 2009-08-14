@@ -67,3 +67,10 @@ TODO
   `templates/django_vcs_watch/repository_detail.html` to make
   inclusion tag for diff representation.
 * Add pretty css for example.
+
+Alters
+======
+
+2009-08-14 17:48:45 'Hash' field renamed to 'slug':
+    alter table django_vcs_watch_repository change hash slug varchar(100) not null;
+
