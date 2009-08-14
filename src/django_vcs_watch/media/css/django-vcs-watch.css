@@ -1,0 +1,5 @@
+ul.revisions {margin-left: 0; margin-right: 0}
+ul.revisions li {border-top: 2px solid black; list-style: none;}
+ul.revisions span.rev, span.date, span.author {float: left; right-padding: 2em; margin-right:1em;}
+ul.revisions p.message {clear: left; margin-top: 2em; background-color: lightgray;}
+ul.revisions .highlight {overflow: hidden;}

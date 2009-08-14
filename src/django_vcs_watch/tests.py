@@ -94,8 +94,26 @@ if not VCS_ONLY_PUBLIC_REPS:
 
 
 
-class Utils(TestCase):
-    def testRewrites(self):
+class Rewrites(TestCase):
+    def testSSH(self):
         from django_vcs_watch.utils import to_svn_ssh
-        self.assertEqual('svn+ssh://svn.example.com/test', to_svn_ssh('svn+ssh://svn.example.com/test'))
+
+        self.assertEqual('svn+ssh://svn.example.com/test',
+              to_svn_ssh('http://svn.example.com/test'))
+
+        self.assertEqual('svn+ssh://svn.example.com/test',
+              to_svn_ssh('https://svn.example.com/test'))
+
+
+    def testWSVN(self):
+        from django_vcs_watch.utils import remove_wsvn
+
+        self.assertEqual('https://svn.example.org/auto',
+             remove_wsvn('https://svn.example.org/websvn/wsvn/auto'))
+
+    def testStripGET(self):
+        from django_vcs_watch.utils import strip_get
+
+        self.assertEqual('https://svn.example.org/auto',
+               strip_get('https://svn.example.org/auto?'))
 
