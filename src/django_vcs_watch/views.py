@@ -21,3 +21,11 @@ def profile(request):
             request,
             queryset=request.user.repository_set.all())
 
+def autocomplete(request, **kwargs):
+    q = request.GET.get('q', '')
+    reps = Repository.objects.filter(url__contains = q)
+    return object_list(
+            request,
+            queryset = reps,
+            **kwargs)
+

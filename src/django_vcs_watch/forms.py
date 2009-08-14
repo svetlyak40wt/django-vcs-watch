@@ -9,12 +9,12 @@ from django_vcs_watch.utils import make_slugs
 
 class _BaseForm(forms.ModelForm):
     def clean_url(self):
-        return VCS_URL_REWRITER(self.cleaned_data['url'])
+        return VCS_URL_REWRITER(self.cleaned_data.get('url', ''))
 
     def clean_slug(self):
         url = self.clean_url()
 
-        if len(Repository.objects.filter(url=url)) == 0:
+        if url and len(Repository.objects.filter(url=url)) == 0:
             def slug_exists(slug):
                 return len(Repository.objects.filter(slug=slug)) > 0
 

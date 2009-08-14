@@ -27,6 +27,10 @@ main_page = {
     }
 }
 
+autocomplete = {
+    'template_name': 'django_vcs_watch/autocomplete.html'
+}
+
 add_page = {
     'form_class': RepositoryForm,
     'extra_context': { 'user': lambda: globals.user },
@@ -42,6 +46,7 @@ urlpatterns = patterns('django.views.generic',
 urlpatterns += patterns('django_vcs_watch.views',
    (r'^r/(?P<repository_slug>[a-z0-9-]+)/(?P<revision>[a-z0-9-]{1,36})/$', 'revision', {}, 'vcs-watch-revision'),
    (r'^profile/$', 'profile', {}, 'vcs-watch-profile'),
+   (r'^autocomplete/$', 'autocomplete', autocomplete, 'vcs-watch-autocomplete'),
 )
 
 urlpatterns += patterns('django.contrib.syndication.views',
