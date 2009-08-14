@@ -4,6 +4,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 
 from django_vcs_watch.models import Repository
+from django_vcs_watch.utils import make_slugs
 from django_vcs_watch.settings import VCS_ONLY_PUBLIC_REPS
 
 from pdb import set_trace
@@ -93,7 +94,6 @@ if not VCS_ONLY_PUBLIC_REPS:
                 self.assertContains(response, hash)
 
 
-
 class Rewrites(TestCase):
     def testSSH(self):
         from django_vcs_watch.utils import to_svn_ssh
@@ -116,4 +116,42 @@ class Rewrites(TestCase):
 
         self.assertEqual('https://svn.example.org/auto',
                strip_get('https://svn.example.org/auto?'))
+
+class Slugs(TestCase):
+    def testMakeSlugs(self):
+        self.assertEqual(
+            [
+                'django',
+                'example-django',
+            ],
+            make_slugs('http://svn.example.com/django/trunk/'))
+
+        self.assertEqual(
+            [
+                'example',
+            ],
+            make_slugs('http://svn.example.com'))
+        self.assertEqual(
+            [
+                'example',
+            ],
+            make_slugs('http://svn.example.com/trunk/'))
+        self.assertEqual(
+            [
+                'django-django-contrib',
+                'example-django-django-contrib',
+            ],
+            make_slugs('http://svn.example.com/django/trunk/django/contrib/'))
+        self.assertEqual(
+            [
+                'django-new-admin',
+                'example-django-new-admin',
+            ],
+            make_slugs('http://svn.example.com/django/branches/new-admin/'))
+        self.assertEqual(
+            [
+                'django-1-1',
+                'example-django-1-1',
+            ],
+            make_slugs('http://svn.example.com/django/tags/1.1/'))
 
