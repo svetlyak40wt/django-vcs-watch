@@ -5,8 +5,8 @@ from django.http import HttpResponseForbidden
 
 from models import Repository
 
-def revision(request, repository_hash, revision):
-    repository = get_object_or_404(Repository, hash=repository_hash)
+def revision(request, repository_slug, revision):
+    repository = get_object_or_404(Repository, hash=repository_slug)
     return object_detail(
             request,
             queryset=repository.revision_set.all(),
