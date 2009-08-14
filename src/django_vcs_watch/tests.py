@@ -39,7 +39,22 @@ class Repositories(_RepsTestCase):
         self.assertEqual(url, reps[0].url)
         self.assertEqual(True, reps[0].public)
 
-        url = reverse('vcs-watch-repository', kwargs = dict(slug=reps[0].hash))
+        url = reverse('vcs-watch-repository', kwargs = dict(slug=reps[0].slug))
+        self.assertRedirects(response, url)
+
+    def testAddRepTwice(self):
+        url = 'http://svn.example.com/trunk/'
+        response = self.client.post(self.add_url, dict(url=url))
+        response = self.client.post(self.add_url, dict(url=url))
+
+        reps = Repository.objects.all()
+        self.assertEqual(1, len(reps))
+        self.assertEqual(url, reps[0].url)
+        self.assertEqual(True, reps[0].public)
+#TODO
+        #self.assertEqual(u'example', reps[0].slug)
+
+        url = reverse('vcs-watch-repository', kwargs = dict(slug=reps[0].slug))
         self.assertRedirects(response, url)
 
 if not VCS_ONLY_PUBLIC_REPS:
@@ -70,28 +85,28 @@ if not VCS_ONLY_PUBLIC_REPS:
             self.assertEqual('svnuser', reps[0].username)
             self.assertEqual('svnpass', reps[0].password)
 
-            url = reverse('vcs-watch-repository', kwargs = dict(slug=reps[0].hash))
+            url = reverse('vcs-watch-repository', kwargs = dict(slug=reps[0].slug))
             self.assertRedirects(response, url)
 
         def testPrivateReposList(self):
             self.assert_(self.client.login(username='tester', password='test'))
 
             url = 'http://svn.example.com/trunk/'
-            hashes = []
+            slugs = []
             for i in xrange(10):
                 response = self.client.post(self.add_url, dict(
                                                 url=url,
                                                 username='svnuser',
                                                 password='svnpass',
                                                 ))
-                hashes.append(response.get('Location', None).split('/')[-2])
+                slugs.append(response.get('Location', None).split('/')[-2])
 
             user_url = reverse('vcs-watch-profile')
             response = self.client.get(user_url)
             self.assertEqual(200, response.status_code)
 
-            for hash in hashes:
-                self.assertContains(response, hash)
+            for slug in slugs:
+                self.assertContains(response, slug)
 
 
 class Rewrites(TestCase):

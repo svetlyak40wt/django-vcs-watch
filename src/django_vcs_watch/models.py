@@ -1,5 +1,4 @@
 import os
-import uuid
 import logging
 import re
 import subprocess
@@ -45,7 +44,7 @@ def strip_timezone(t):
 
 class Repository(models.Model):
     user = models.ForeignKey(User, editable=False, blank=True, null=True)
-    hash = models.CharField(_('Hash'), editable=False, max_length=36)
+    slug = models.CharField(_('Slug'), max_length=100, blank=True)
     url = models.CharField(_('URL'), max_length=255)
     last_rev = models.CharField(_('Last revision'), editable=False, max_length=32)
     last_access = models.DateTimeField(_('Last access date'), editable=False, null=True)
@@ -81,15 +80,14 @@ class Repository(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('vcs-watch-repository', (), {'slug': self.hash})
+        return ('vcs-watch-repository', (), {'slug': self.slug})
 
     @models.permalink
     def get_rss_url(self):
-        return ('vcs-watch-feeds', (), {'url': 'diffs/%s' % self.hash })
+        return ('vcs-watch-feeds', (), {'url': 'diffs/%s' % self.slug })
 
     def save(self):
         if not self.id:
-            self.hash = unicode(uuid.uuid4())
             self.created_at = datetime.today()
 
             from django_globals import globals
@@ -128,11 +126,11 @@ class Repository(models.Model):
              need_to_update = False
 
         if not need_to_update:
-            logger.debug('no need to update %s' % self.hash)
+            logger.debug('no need to update %s' % self.slug)
             return
 
 
-        logger.debug('update %s' % self.hash)
+        logger.debug('update %s' % self.slug)
 
         command = ['svn', 'log', '--non-interactive']
 
@@ -231,7 +229,7 @@ class Revision(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('vcs-watch-revision', (), {'repository_hash': self.repos.hash, 'revision': self.rev})
+        return ('vcs-watch-revision', (), {'repository_hash': self.repos.slug, 'revision': self.rev})
 
     class Meta:
         ordering = ('-date',)

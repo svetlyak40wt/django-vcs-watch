@@ -7,12 +7,12 @@ from django_globals import globals
 
 repository_info = {
     'queryset': Repository.objects.all(),
-    'slug_field': 'hash'
+    'slug_field': 'slug'
 }
 
 revision_info = {
     'queryset': Revision.objects.all(),
-    'slug_field': 'hash'
+    'slug_field': 'slug'
 }
 
 feeds = {

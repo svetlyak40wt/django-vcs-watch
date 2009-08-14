@@ -7,7 +7,7 @@ from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django_vcs_watch.models import Repository
 
 def revision(request, repository_slug, revision):
-    repository = get_object_or_404(Repository, hash=repository_slug)
+    repository = get_object_or_404(Repository, slug=repository_slug)
     return object_detail(
             request,
             queryset=repository.revision_set.all(),
