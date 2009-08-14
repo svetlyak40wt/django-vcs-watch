@@ -51,8 +51,7 @@ class Repositories(_RepsTestCase):
         self.assertEqual(1, len(reps))
         self.assertEqual(url, reps[0].url)
         self.assertEqual(True, reps[0].public)
-#TODO
-        #self.assertEqual(u'example', reps[0].slug)
+        self.assertEqual(u'example', reps[0].slug)
 
         url = reverse('vcs-watch-repository', kwargs = dict(slug=reps[0].slug))
         self.assertRedirects(response, url)

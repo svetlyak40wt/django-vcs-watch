@@ -33,15 +33,15 @@ add_page = {
 }
 
 urlpatterns = patterns('django.views.generic',
-   (r'^r/(?P<slug>[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})/$',
+   (r'^r/(?P<slug>[a-z0-9-]+)/$',
         'list_detail.object_detail', repository_info, 'vcs-watch-repository'),
+   (r'^add/$', 'create_update.create_object', add_page, 'vcs-watch-add'),
    #(r'^r/$', 'simple.direct_to_template', main_page, 'vcs-watch-main-page'),
 )
 
 urlpatterns += patterns('django_vcs_watch.views',
-   (r'^r/(?P<repository_slug>[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})/(?P<revision>[a-z0-9-]{1,36})/$', 'revision', {}, 'vcs-watch-revision'),
+   (r'^r/(?P<repository_slug>[a-z0-9-]+)/(?P<revision>[a-z0-9-]{1,36})/$', 'revision', {}, 'vcs-watch-revision'),
    (r'^profile/$', 'profile', {}, 'vcs-watch-profile'),
-   (r'^add/$', 'add_repository', add_page, 'vcs-watch-add'),
 )
 
 urlpatterns += patterns('django.contrib.syndication.views',

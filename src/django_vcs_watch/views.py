@@ -21,13 +21,3 @@ def profile(request):
             request,
             queryset=request.user.repository_set.all())
 
-
-def add_repository(request, *args, **kwargs):
-    url = request.POST.get('url', None)
-    reps = Repository.objects.filter(url = url).all()
-
-    if len(reps) > 0:
-        return HttpResponseRedirect(reps[0].get_absolute_url())
-
-    return create_object(request, *args, **kwargs)
-
