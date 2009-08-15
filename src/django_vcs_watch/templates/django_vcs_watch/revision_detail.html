@@ -1,16 +1,7 @@
 {% extends 'base.html' %}
 {% load i18n syntax_color %}
 
-{% block style %}
-    {{block.super}}
-    {% pygments_css %}
-    ul.revisions li {border-top: 2px solid black; list-style: none;}
-    span.rev, span.date, span.author {float: left; right-padding: 2em; margin-right:1em;}
-    p.message {clear: left; margin-top: 2em; background-color: lightgray;}
-    .highlight {overflow: hidden;}
-{% endblock %}
-
-{% block headline %}{% block title %}{% trans 'Revision' %} {{object.rev}}{% endblock %}{% endblock %}
+{% block content-title-inner %}{% block title %}{% trans 'Repository' %} {{ object.repos.slug }} {% trans 'revision' %} {{ object.rev }}{% endblock %}{% endblock %}
 
 {% block content %}
     {{block.super}}
