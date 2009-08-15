@@ -21,7 +21,7 @@ class LatestRevisions(Feed):
     def get_object(self, bits):
         if len(bits) != 1:
             raise ObjectDoesNotExist
-        repository = Repository.objects.get(hash__exact=bits[0])
+        repository = Repository.objects.get(slug__exact=bits[0])
         repository.update_last_access()
         return repository
 

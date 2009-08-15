@@ -229,7 +229,7 @@ class Revision(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('vcs-watch-revision', (), {'repository_hash': self.repos.slug, 'revision': self.rev})
+        return ('vcs-watch-revision', (), {'repository_slug': self.repos.slug, 'revision': self.rev})
 
     class Meta:
         ordering = ('-date',)
