@@ -1,0 +1,5 @@
+<ul class="commits"
+{% for commit in commits %}
+    <li><a href="{{ commit.get_absolute_url }}">{{ commit.repos.slug }}@{{ commit.rev }}</a>&mdash;<em>"{{ commit.message }}"</em> by {{ commit.author }}</li>
+{% endfor %}
+</ul>
