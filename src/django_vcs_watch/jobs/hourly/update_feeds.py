@@ -12,14 +12,14 @@ class Job(HourlyJob):
     help = "Update VCS feeds"
 
     def execute(self):
-        _log = logging.getLogger('django_vcs_watch.jobs.update_feeds')
+        log = logging.getLogger('django_vcs_watch.jobs.update_feeds')
 
         pidfile = getattr(settings, 'VCS_WATCH_PID_FILE', '/tmp/vcswatch_update_feeds.pid')
 
         if os.path.exists(pidfile):
             pid = int(open(pidfile).read())
             if os.path.exists('/proc/%d' % pid):
-                _log.warning('Job already running with pid %d (pidfile "%s" exists)' % (pid, pidfile))
+                log.warning('Job already running with pid %d (pidfile "%s" exists)' % (pid, pidfile))
                 return
 
         f = open(pidfile, 'w')
@@ -28,13 +28,18 @@ class Job(HourlyJob):
         finally:
             f.close()
 
-        for repos in Repository.objects.filter(
+        reps_to_update = Repository.objects.filter(
                 Q(next_check_at__isnull = True) |
-                Q(next_check_at__lte = datetime.utcnow())):
+                Q(next_check_at__lte = datetime.utcnow()))
+
+        for rep in reps_to_update:
+            log.debug('rep to update: %s' % rep.url)
+
+        for rep in reps_to_update:
             try:
-                repos.updateFeed()
+                rep.updateFeed()
             except Exception, e:
-                _log.exception("can't update feed for repo %s" % repos)
+                log.exception("can't update feed for rep %s" % rep)
 
         os.remove(pidfile)
 

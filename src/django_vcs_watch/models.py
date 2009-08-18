@@ -1,20 +1,14 @@
 import os
 import logging
-import re
-import subprocess
 
 from pdb import set_trace
 from datetime import datetime
-from dateutil.parser import parse as parse_date
-from dateutil.tz import tzutc
-
-from xml.etree import ElementTree as ET
 
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import DjangoUnicodeDecodeError, force_unicode
+from django.utils.encoding import DjangoUnicodeDecodeError
 
 from django_fields.fields import EncryptedCharField
 
@@ -34,17 +28,6 @@ if 'django_globals' not in settings.INSTALLED_APPS:
 if 'django_globals.middleware.User' not in settings.MIDDLEWARE_CLASSES:
     raise Exception('Please, add django_globals.middleware.User to the MIDDLEWARE_CLASSES.')
 
-def guess_encoding(s):
-    options = [
-        {}, {'encoding': 'cp1251'}, {'encoding': 'koi8-r'},
-        {'encoding': 'utf-8', 'errors': 'ignore'}
-    ]
-    for o in options:
-        try:
-            return force_unicode(s, **o)
-        except DjangoUnicodeDecodeError:
-            pass
-    raise Exception('Can\'t decode string: %r' % s)
 
 class Repository(models.Model):
     user = models.ForeignKey(User, editable=False, blank=True, null=True)
@@ -109,114 +92,56 @@ class Repository(models.Model):
 
 
     def updateFeed(self):
-        logger = logging.getLogger('django_vcs_watch.repository.updateFeed')
-        logger.debug('update %s' % self.slug)
+        log = logging.getLogger('django_vcs_watch.repository.updateFeed')
+        log.debug('update %s' % self.slug)
 
-        command = ['svn', 'log', '--non-interactive']
-
-        if self.last_rev:
-            command += ['-r', 'HEAD:%s' % self.last_rev]
-
-        if REVISION_LIMIT:
-            command += ['--limit', '%s' % REVISION_LIMIT]
-
-        if self.username:
-            command += ['--username', self.username]
-
-        if self.password:
-            command += ['--password', self.password]
-
-        command += ['--xml', self.url]
-
-        logger.debug(re.sub(r"--password '.*'", "--password 'xxxxx'", ' '.join(command)))
-
-        svn = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        xml, stderr = svn.communicate()
-
-        if svn.returncode != 0 or stderr or not xml:
-            logger.error('svn command failed with code %d and message %r' % (svn.returncode, stderr))
-            self.last_error = '<br />'.join(stderr.splitlines())
-
-            # TODO code duplication in error handling
-            if self.last_error_date:
-                interval_to_check = min(
-                    max((datetime.utcnow() - self.last_error_date) * 2, CHECK_INTERVAL_MIN),
-                    CHECK_INTERVAL_MAX)
-            else:
-                interval_to_check = CHECK_INTERVAL_MIN
-            logger.debug('next check will be after %s' % timedelta_to_string(interval_to_check))
-
-            self.last_error_date = datetime.utcnow()
-            self.next_check_at = self.last_error_date + interval_to_check
-            self.save()
-            return
-
+        from django_vcs_watch.backends.svn import get_updates
         try:
-            xml_e = ET.fromstring(xml)
+            commits = get_updates(self.url, self.last_rev,
+                                  self.username, self.password)
         except Exception, e:
-            logger.error(e)
-            logger.error(xml)
+            log.exception('error during commits fetching')
             self.last_error = unicode(e)
 
-            # TODO code duplication in error handling
             if self.last_error_date:
                 interval_to_check = min(
                     max((datetime.utcnow() - self.last_error_date) * 2, CHECK_INTERVAL_MIN),
                     CHECK_INTERVAL_MAX)
             else:
                 interval_to_check = CHECK_INTERVAL_MIN
-            logger.debug('next check will be after %s' % timedelta_to_string(interval_to_check))
+            log.debug('next check will be after %s' % timedelta_to_string(interval_to_check))
 
             self.last_error_date = datetime.utcnow()
             self.next_check_at = self.last_error_date + interval_to_check
             self.save()
             return
 
-        diffs = []
-        for entry_e in xml_e.findall('logentry'):
-            revision = entry_e.attrib['revision']
-            if self.revision_set.filter(rev=revision).count() > 0:
+
+        for commit in commits:
+            if self.revision_set.filter(rev = commit['revision']).count() > 0:
                 continue
 
-            author = entry_e.find('author').text
-            msg = entry_e.find('msg').text
-            date = parse_date(entry_e.find('date').text).astimezone(tzutc())
-
-            command = ['svn', 'diff', '-c', str(revision), self.url]
-            logger.debug('fetching diff: %r' % ' '.join(command))
-
-            svn = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            diff, stderr = svn.communicate()
-
-            diffs.append( Revision(repos = self,
-                               rev = revision,
-                               diff=guess_encoding(diff),
-                               message=msg or u'',
-                               date=strip_timezone(date),
-                               author=author
+            revision = Revision(repos   = self,
+                                rev     = commit['revision'],
+                                diff    = commit['diff'],
+                                message = commit['message'],
+                                date    = commit['date'],
+                                author  = commit['author'],
                                )
-                        )
-
-        for diff in reversed(diffs):
-            logger.debug('saving %s r%s' % (self.url, diff.rev))
             try:
-                diff.save()
+                revision.save()
             except DjangoUnicodeDecodeError:
                 # just ignore this strange errors,
                 # caused by wrong encoding in the comments
                 # or binary files without mime type.
-                logger.error('unicode decode exception on saving %s:%s' % (self.url, diff.rev))
-            self.last_rev = diff.rev
-            self.updated_at = diff.date
+                log.error('unicode decode exception on saving %s:%s' % (self.url, revision.rev))
+            self.last_rev = revision.rev
+            self.updated_at = revision.date
 
 
-        if len(diffs) > 0:
+        if len(commits) > 0:
             self.last_error = None
             self.last_error_date = None
-
-        for old_revision in self.revision_set.all()[REVISION_LIMIT:]:
-            old_revision.delete()
-
 
         # don't update more often than latest commits
         latest_revisions = self.revision_set.all()[:2]
@@ -228,12 +153,11 @@ class Repository(models.Model):
         else:
             interval_to_check = CHECK_INTERVAL_MIN
 
-        logger.debug('next check will be after %s' % timedelta_to_string(interval_to_check))
+        log.debug('next check will be after %s' % timedelta_to_string(interval_to_check))
 
         self.last_check_at = datetime.utcnow()
         self.next_check_at = self.last_check_at + interval_to_check
         self.save()
-
 
 
 

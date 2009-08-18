@@ -1,4 +1,7 @@
 import re
+from datetime import datetime
+
+from django.utils.encoding import DjangoUnicodeDecodeError, force_unicode
 
 # URL rewriters
 _http_re = re.compile(r'^(https|http)')
@@ -42,8 +45,10 @@ def make_slugs(url):
 
     return ['-'.join(slug) for slug in result if slug]
 
+
 def strip_timezone(t):
     return datetime(t.year, t.month, t.day, t.hour, t.minute, t.second, t.microsecond)
+
 
 def timedelta_to_string(td):
     return '%d days, %d hours, %d minutes, %d seconds' % (
@@ -52,4 +57,17 @@ def timedelta_to_string(td):
         td.seconds % 3600 / 60,
         td.seconds % 60
     )
+
+
+def guess_encoding(s):
+    options = [
+        {}, {'encoding': 'cp1251'}, {'encoding': 'koi8-r'},
+        {'encoding': 'utf-8', 'errors': 'ignore'}
+    ]
+    for o in options:
+        try:
+            return force_unicode(s, **o)
+        except DjangoUnicodeDecodeError:
+            pass
+    raise Exception('Can\'t decode string: %r' % s)
 
