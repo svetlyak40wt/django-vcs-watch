@@ -1,7 +1,7 @@
 from django.conf.urls.defaults import *
 from models import Repository, Revision
 from forms import RepositoryForm
-from feeds import LatestRevisions, LatestRepositories
+from feeds import LatestRepositories, LatestCommits
 
 from django_globals import globals
 
@@ -16,7 +16,7 @@ revision_info = {
 }
 
 feeds = {
-    'diffs': LatestRevisions,
+    'commits': LatestCommits,
     'repositories': LatestRepositories,
 }
 
@@ -36,20 +36,20 @@ add_page = {
     'extra_context': { 'user': lambda: globals.user },
 }
 
-urlpatterns = patterns('django.views.generic',
-   (r'^r/(?P<slug>[a-z0-9-]+)/$',
-        'list_detail.object_detail', repository_info, 'vcs-watch-repository'),
-   (r'^add/$', 'create_update.create_object', add_page, 'vcs-watch-add'),
-   #(r'^r/$', 'simple.direct_to_template', main_page, 'vcs-watch-main-page'),
-)
-
-urlpatterns += patterns('django_vcs_watch.views',
+urlpatterns = patterns('django_vcs_watch.views',
+   (r'^r/feed/$',
+        'feed', {'slug': 'repositories', 'feed_dict': feeds}, 'vcs-watch-feed-repositories'),
+   (r'^r/(?P<param>[a-z0-9-]+)/feed/$',
+        'feed', {'slug': 'commits', 'feed_dict': feeds}, 'vcs-watch-feed-commits'),
    (r'^r/(?P<repository_slug>[a-z0-9-]+)/(?P<revision>[a-z0-9-]{1,36})/$', 'revision', {}, 'vcs-watch-revision'),
    (r'^profile/$', 'profile', {}, 'vcs-watch-profile'),
    (r'^autocomplete/$', 'autocomplete', autocomplete, 'vcs-watch-autocomplete'),
 )
 
-urlpatterns += patterns('django.contrib.syndication.views',
-   (r'^feed/(?P<url>.*)/$', 'feed', {'feed_dict': feeds}, 'vcs-watch-feeds'),
+urlpatterns += patterns('django.views.generic',
+   (r'^r/$', 'simple.direct_to_template', main_page, 'vcs-watch-repositories'),
+   (r'^r/(?P<slug>[a-z0-9-]+)/$',
+        'list_detail.object_detail', repository_info, 'vcs-watch-repository'),
+   (r'^add/$', 'create_update.create_object', add_page, 'vcs-watch-add'),
 )
 

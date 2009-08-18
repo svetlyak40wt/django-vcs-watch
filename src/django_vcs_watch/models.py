@@ -84,7 +84,7 @@ class Repository(models.Model):
 
     @models.permalink
     def get_rss_url(self):
-        return ('vcs-watch-feeds', (), {'url': 'diffs/%s' % self.slug })
+        return ('vcs-watch-feed-commits', (), {'param': self.slug })
 
     def save(self):
         if not self.id:

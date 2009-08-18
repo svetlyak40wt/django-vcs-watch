@@ -29,3 +29,12 @@ def autocomplete(request, **kwargs):
             queryset = reps,
             **kwargs)
 
+# TODO move this to separate django app like django-annoing
+from django.contrib.syndication.views import feed as contrib_feed
+
+def feed(request, slug, param = '', feed_dict = None):
+    url = slug
+    if param:
+        url += '/' + param
+    return contrib_feed(request, url, feed_dict = feed_dict)
+

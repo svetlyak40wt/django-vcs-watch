@@ -1,14 +1,17 @@
 from django.contrib.syndication.feeds import FeedDoesNotExist, Feed
 from django.core.exceptions import ObjectDoesNotExist
-from models import Repository
+from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import string_concat
 
+from django_vcs_watch.models import Repository
+
 class LatestRepositories(Feed):
     title = _('Last added repositories')
-    # TODO reverse
-    link = '/vcs/'
     description = _('Last added VCS repositories')
+
+    def link(self):
+        return reverse('vcs-watch-repositories')
 
     def items(self):
         return Repository.objects.filter(public=True).exclude(updated_at=None).order_by('-created_at')[:20]
@@ -17,7 +20,7 @@ class LatestRepositories(Feed):
         return item.created_at
 
 
-class LatestRevisions(Feed):
+class LatestCommits(Feed):
     def get_object(self, bits):
         if len(bits) != 1:
             raise ObjectDoesNotExist
