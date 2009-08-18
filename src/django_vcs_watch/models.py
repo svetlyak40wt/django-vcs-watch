@@ -4,7 +4,7 @@ import re
 import subprocess
 
 from pdb import set_trace
-from datetime import datetime, timedelta
+from datetime import datetime
 from dateutil.parser import parse as parse_date
 from dateutil.tz import tzutc
 
@@ -18,7 +18,14 @@ from django.utils.encoding import DjangoUnicodeDecodeError, force_unicode
 
 from django_fields.fields import EncryptedCharField
 
-_REVISION_LIMIT = getattr(settings, 'VCS_REVISION_LIMIT', 20)
+from django_vcs_watch.settings import \
+    REVISION_LIMIT, \
+    CHECK_INTERVAL_MIN, \
+    CHECK_INTERVAL_MAX
+
+from django_vcs_watch.utils import \
+    timedelta_to_string, \
+    strip_timezone
 
 
 if 'django_globals' not in settings.INSTALLED_APPS:
@@ -38,9 +45,6 @@ def guess_encoding(s):
         except DjangoUnicodeDecodeError:
             pass
     raise Exception('Can\'t decode string: %r' % s)
-
-def strip_timezone(t):
-    return datetime(t.year, t.month, t.day, t.hour, t.minute, t.second, t.microsecond)
 
 class Repository(models.Model):
     user = models.ForeignKey(User, editable=False, blank=True, null=True)
@@ -62,6 +66,7 @@ class Repository(models.Model):
     last_error = models.TextField(_('Last error'), editable=False, null=True)
     last_error_date = models.DateTimeField(_('Last error\'s date'), editable=False, null=True)
     last_check_at = models.DateTimeField(_('Last check\'s date'), editable=False, null=True)
+    next_check_at = models.DateTimeField(_('Next check\'s date'), editable=False, null=True)
 
 
     class Meta:
@@ -74,7 +79,7 @@ class Repository(models.Model):
         return _('Repository at %s') % self.url
 
     def update_last_access(self):
-        self.last_access = datetime.today()
+        self.last_access = datetime.utcnow()
         self.save()
         return ''
 
@@ -88,7 +93,7 @@ class Repository(models.Model):
 
     def save(self):
         if not self.id:
-            self.created_at = datetime.today()
+            self.created_at = datetime.utcnow()
 
             from django_globals import globals
             user = getattr(globals, 'user', None)
@@ -105,31 +110,6 @@ class Repository(models.Model):
 
     def updateFeed(self):
         logger = logging.getLogger('django_vcs_watch.repository.updateFeed')
-
-        need_to_update = True
-        interval_to_check = timedelta(0, getattr(settings, 'VCS_WATCH_CHECK_INTERVAL', 60)*60)
-
-        # don't update more often than latest commits
-        if self.last_check_at is not None:
-            latest_revisions = self.revision_set.all()[:2]
-            if len(latest_revisions) == 2:
-                rev1, rev2 = latest_revisions
-                interval_to_check = rev1.date - rev2.date
-
-            logger.debug('interval to check %r, last_check %r' % (interval_to_check, self.last_check_at))
-            if (datetime.today() - self.last_check_at) < interval_to_check:
-                need_to_update = False
-
-        # wait for hour after error
-        elif self.last_error_date is not None and \
-             ((datetime.today() - self.last_error_date) < interval_to_check):
-             need_to_update = False
-
-        if not need_to_update:
-            logger.debug('no need to update %s' % self.slug)
-            return
-
-
         logger.debug('update %s' % self.slug)
 
         command = ['svn', 'log', '--non-interactive']
@@ -137,8 +117,8 @@ class Repository(models.Model):
         if self.last_rev:
             command += ['-r', 'HEAD:%s' % self.last_rev]
 
-        if _REVISION_LIMIT:
-            command += ['--limit', '%s' % _REVISION_LIMIT]
+        if REVISION_LIMIT:
+            command += ['--limit', '%s' % REVISION_LIMIT]
 
         if self.username:
             command += ['--username', self.username]
@@ -156,7 +136,18 @@ class Repository(models.Model):
         if svn.returncode != 0 or stderr or not xml:
             logger.error('svn command failed with code %d and message %r' % (svn.returncode, stderr))
             self.last_error = '<br />'.join(stderr.splitlines())
-            self.last_error_date = datetime.today()
+
+            # TODO code duplication in error handling
+            if self.last_error_date:
+                interval_to_check = min(
+                    max((datetime.utcnow() - self.last_error_date) * 2, CHECK_INTERVAL_MIN),
+                    CHECK_INTERVAL_MAX)
+            else:
+                interval_to_check = CHECK_INTERVAL_MIN
+            logger.debug('next check will be after %s' % timedelta_to_string(interval_to_check))
+
+            self.last_error_date = datetime.utcnow()
+            self.next_check_at = self.last_error_date + interval_to_check
             self.save()
             return
 
@@ -165,6 +156,20 @@ class Repository(models.Model):
         except Exception, e:
             logger.error(e)
             logger.error(xml)
+            self.last_error = unicode(e)
+
+            # TODO code duplication in error handling
+            if self.last_error_date:
+                interval_to_check = min(
+                    max((datetime.utcnow() - self.last_error_date) * 2, CHECK_INTERVAL_MIN),
+                    CHECK_INTERVAL_MAX)
+            else:
+                interval_to_check = CHECK_INTERVAL_MIN
+            logger.debug('next check will be after %s' % timedelta_to_string(interval_to_check))
+
+            self.last_error_date = datetime.utcnow()
+            self.next_check_at = self.last_error_date + interval_to_check
+            self.save()
             return
 
         diffs = []
@@ -209,11 +214,27 @@ class Repository(models.Model):
             self.last_error = None
             self.last_error_date = None
 
-        for old_revision in self.revision_set.all()[_REVISION_LIMIT:]:
+        for old_revision in self.revision_set.all()[REVISION_LIMIT:]:
             old_revision.delete()
 
-        self.last_check_at = datetime.today()
+
+        # don't update more often than latest commits
+        latest_revisions = self.revision_set.all()[:2]
+        if len(latest_revisions) == 2:
+            rev1, rev2 = latest_revisions
+            interval_to_check = min(
+                max(rev1.date - rev2.date, CHECK_INTERVAL_MIN),
+                CHECK_INTERVAL_MAX)
+        else:
+            interval_to_check = CHECK_INTERVAL_MIN
+
+        logger.debug('next check will be after %s' % timedelta_to_string(interval_to_check))
+
+        self.last_check_at = datetime.utcnow()
+        self.next_check_at = self.last_check_at + interval_to_check
         self.save()
+
+
 
 
 class Revision(models.Model):

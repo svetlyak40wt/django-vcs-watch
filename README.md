@@ -73,4 +73,6 @@ Alters
 
 2009-08-14 17:48:45 'Hash' field renamed to 'slug':
     alter table django_vcs_watch_repository change hash slug varchar(100) not null;
+2009-08-18 05:54:05 Added next_check_at field:
+    alter table django_vcs_watch_repository add `next_check_at` datetime;
 

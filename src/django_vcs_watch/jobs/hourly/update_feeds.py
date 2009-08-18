@@ -1,9 +1,12 @@
 import os
 import logging
+from datetime import datetime
+
+from django.conf import settings
+from django.db.models import Q
 
 from django_extensions.management.jobs import HourlyJob
 from django_vcs_watch.models import Repository
-from django.conf import settings
 
 class Job(HourlyJob):
     help = "Update VCS feeds"
@@ -25,7 +28,9 @@ class Job(HourlyJob):
         finally:
             f.close()
 
-        for repos in Repository.objects.all():
+        for repos in Repository.objects.filter(
+                Q(next_check_at__isnull = True) |
+                Q(next_check_at__lte = datetime.utcnow())):
             try:
                 repos.updateFeed()
             except Exception, e:

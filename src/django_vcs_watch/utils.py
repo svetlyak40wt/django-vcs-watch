@@ -42,3 +42,14 @@ def make_slugs(url):
 
     return ['-'.join(slug) for slug in result if slug]
 
+def strip_timezone(t):
+    return datetime(t.year, t.month, t.day, t.hour, t.minute, t.second, t.microsecond)
+
+def timedelta_to_string(td):
+    return '%d days, %d hours, %d minutes, %d seconds' % (
+        td.days,
+        td.seconds / 3600,
+        td.seconds % 3600 / 60,
+        td.seconds % 60
+    )
+
