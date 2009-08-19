@@ -44,6 +44,8 @@ def get_updates(url, last_rev, username = None, password = None):
     commits = []
     for entry_e in xml_e.findall('logentry'):
         revision = entry_e.attrib['revision']
+        if revision == last_rev:
+            continue
 
         author = entry_e.find('author').text
         msg = entry_e.find('msg').text
