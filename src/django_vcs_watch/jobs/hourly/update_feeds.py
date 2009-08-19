@@ -1,5 +1,6 @@
 import os
 import logging
+import time
 from datetime import datetime
 
 from django.conf import settings
@@ -7,6 +8,7 @@ from django.db.models import Q
 
 from django_extensions.management.jobs import HourlyJob
 from django_vcs_watch.models import Repository
+from django_vcs_watch.settings import DELAY_BETWEEN_UPDATE_CHECK
 
 class Job(HourlyJob):
     help = "Update VCS feeds"
@@ -28,6 +30,16 @@ class Job(HourlyJob):
         finally:
             f.close()
 
+        try:
+            while True:
+                self.update_repositories()
+                time.sleep(DELAY_BETWEEN_UPDATE_CHECK)
+        finally:
+            os.remove(pidfile)
+
+
+    def update_repositories(self):
+        log = logging.getLogger('django_vcs_watch.jobs.update_feeds')
         reps_to_update = Repository.objects.filter(
                 Q(next_check_at__isnull = True) |
                 Q(next_check_at__lte = datetime.utcnow()))
@@ -40,6 +52,4 @@ class Job(HourlyJob):
                 rep.updateFeed()
             except Exception, e:
                 log.exception("can't update feed for rep %s" % rep)
-
-        os.remove(pidfile)
 
