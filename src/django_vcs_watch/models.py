@@ -101,7 +101,7 @@ class Repository(models.Model):
                                   self.username, self.password)
         except Exception, e:
             log.exception('error during commits fetching')
-            self.last_error = unicode(e)
+            self.last_error = str(e)
 
             if self.last_error_date:
                 interval_to_check = min(
