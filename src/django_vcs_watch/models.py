@@ -1,5 +1,6 @@
 import os
 import logging
+import operator
 
 from pdb import set_trace
 from datetime import datetime
@@ -144,11 +145,16 @@ class Repository(models.Model):
             self.last_error_date = None
 
         # don't update more often than latest commits
-        latest_revisions = self.revision_set.all()[:2]
-        if len(latest_revisions) == 2:
-            rev1, rev2 = latest_revisions
+        latest_revisions = self.revision_set.all()[:3]
+        if len(latest_revisions) > 0:
+            deltas = [latest_revisions[0].date - datetime.utcnow()]
+            for i in xrange(1, len(latest_revisions)):
+                deltas.append(latest_revisions[i-1].date - latest_revisions[i].date)
+
+            interval_to_check = reduce(operator.add, deltas) / len(deltas)
+
             interval_to_check = min(
-                max(rev1.date - rev2.date, CHECK_INTERVAL_MIN),
+                max(interval_to_check, CHECK_INTERVAL_MIN),
                 CHECK_INTERVAL_MAX)
         else:
             interval_to_check = CHECK_INTERVAL_MIN
