@@ -147,7 +147,7 @@ class Repository(models.Model):
         # don't update more often than latest commits
         latest_revisions = self.revision_set.all()[:3]
         if len(latest_revisions) > 0:
-            deltas = [latest_revisions[0].date - datetime.utcnow()]
+            deltas = [datetime.utcnow() - latest_revisions[0].date]
             for i in xrange(1, len(latest_revisions)):
                 deltas.append(latest_revisions[i-1].date - latest_revisions[i].date)
 
