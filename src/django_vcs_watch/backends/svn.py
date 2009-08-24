@@ -7,7 +7,8 @@ from xml.etree import ElementTree as ET
 
 from django_vcs_watch.utils import \
     strip_timezone, \
-    guess_encoding
+    guess_encoding, \
+    DiffProcessor
 
 from django_vcs_watch.settings import \
     REVISION_LIMIT
@@ -42,6 +43,8 @@ def get_updates(url, last_rev, username = None, password = None):
     xml_e = ET.fromstring(xml)
 
     commits = []
+    diff_processor = DiffProcessor()
+
     for entry_e in xml_e.findall('logentry'):
         revision = entry_e.attrib['revision']
         if revision == last_rev:
@@ -59,7 +62,7 @@ def get_updates(url, last_rev, username = None, password = None):
 
         commits.insert(0, dict(
                            revision = revision,
-                           diff = guess_encoding(diff),
+                           changes = diff_processor.process(guess_encoding(diff)),
                            message = msg or u'',
                            date = strip_timezone(date),
                            author = author

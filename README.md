@@ -55,22 +55,7 @@ These options can be added to your settings.py:
 TODO
 ====
 
-* Add special slugificator for urls from popular hostings like GoogleCode (
-    http://django-grappelli.googlecode.com/svn/trunk/)
-* Fix wsvn rewriter for urls like https://opensource.yandex.ru/wsvn/xscript/?sc=0
 * Write a short *Installation* instruction.
 * Add check for valid and accessible URL before add it to database.
 * Add ability to edit or remove Repository.
-* Refactor `templates/django_vcs_watch/revision_detail.html` and
-  `templates/django_vcs_watch/repository_detail.html` to make
-  inclusion tag for diff representation.
-* Add pretty css for example.
-
-Alters
-======
-
-2009-08-14 17:48:45 'Hash' field renamed to 'slug':
-    alter table django_vcs_watch_repository change hash slug varchar(100) not null;
-2009-08-18 05:54:05 Added next_check_at field:
-    alter table django_vcs_watch_repository add `next_check_at` datetime;
 

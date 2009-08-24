@@ -1,14 +1,15 @@
 import os
 import logging
 import time
-from datetime import datetime
+import datetime
 
+from itertools import chain
 from django.conf import settings
-from django.db.models import Q
 
 from django_extensions.management.jobs import HourlyJob
-from django_vcs_watch.models import Repository
+from django_vcs_watch.models import Repository, Commit
 from django_vcs_watch.settings import DELAY_BETWEEN_UPDATE_CHECK
+from django_vcs_watch.utils import mongo
 
 class Job(HourlyJob):
     help = "Update VCS feeds"
@@ -40,16 +41,17 @@ class Job(HourlyJob):
 
     def update_repositories(self):
         log = logging.getLogger('django_vcs_watch.jobs.update_feeds')
-        reps_to_update = Repository.objects.filter(
-                Q(next_check_at__isnull = True) |
-                Q(next_check_at__lte = datetime.utcnow()))
+        db = mongo()
 
-        for rep in reps_to_update:
+        new_reps = Repository.objects.find({'next_check_at': None})
+        reps_to_update = Repository.objects.find({'next_check_at': {'$lte': datetime.datetime.utcnow()}})
+
+        for rep in chain(new_reps, reps_to_update):
             log.debug('rep to update: %s' % rep.url)
-
-        for rep in reps_to_update:
             try:
                 rep.updateFeed()
             except Exception, e:
                 log.exception("can't update feed for rep %s" % rep)
+
+        Commit.objects.ensure_index([('date', 1)])
 

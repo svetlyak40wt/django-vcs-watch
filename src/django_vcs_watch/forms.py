@@ -1,59 +1,64 @@
 import uuid
+from pdb import set_trace
+
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
 from django_vcs_watch.models import Repository
 from django_vcs_watch.settings import VCS_ONLY_PUBLIC_REPS, \
                                       VCS_URL_REWRITER
-from django_vcs_watch.utils import make_slugs
+from django_vcs_watch.utils import make_slug
 
-class _BaseForm(forms.ModelForm):
+
+
+def find_unused_slug(slug):
+    def slug_exists(slug):
+        return len(Repository.objects.find({'slug': slug})) > 0
+
+    if not slug_exists(slug):
+        return slug
+
+    for i in xrange(2, 1000):
+        new_slug = '%s-%d' % (slug, i)
+        if not slug_exists(new_slug):
+            return new_slug
+    raise Exception("Can't find unused slug.")
+
+
+
+class RepositoryForm(forms.Form):
+    url      = forms.CharField(max_length = 255)
+    slug     = forms.SlugField(required = False)
+    username = forms.CharField(max_length = 40, required = False)
+    password = forms.CharField(max_length = 40, required = False, widget = forms.PasswordInput())
+
     def clean_url(self):
         return VCS_URL_REWRITER(self.cleaned_data.get('url', ''))
 
-    def clean_slug(self):
-        url = self.clean_url()
-
-        if url and len(Repository.objects.filter(url=url)) == 0:
-            def slug_exists(slug):
-                return len(Repository.objects.filter(slug=slug)) > 0
-
-            slug = self.cleaned_data['slug']
-            if slug:
-                if slug_exists(slug):
-                    raise forms.ValidationError(_('Repository with slug "%s" already exists.') % slug)
-                return slug
-
-            slugs = make_slugs(url)
-            for slug in slugs:
-                if not slug_exists(slug):
-                    return slug
-            raise forms.ValidationError(_('Please, specify slug for this URL.'))
-
     def save(self):
-        try:
-            return Repository.objects.get(url=self.cleaned_data['url'])
-        except Repository.DoesNotExist:
-            pass
-        return super(_BaseForm, self).save()
+        repository = Repository.objects.find_one({'url': self.cleaned_data['url']})
 
+        data = {
+            'public': True,
+            'slug': None,
+        }
+        data.update(self.cleaned_data)
 
-class PrivateRepositoryForm(_BaseForm):
-    password = forms.CharField(
-            max_length=Repository._meta.get_field('password').max_length,
-            required=(not Repository._meta.get_field('password').blank),
-            widget=forms.PasswordInput())
+        if repository:
+            if not data['slug']:
+                del data['slug']
+            repository.update(data)
+        else:
+            slug = data['slug']
+            if not slug:
+                slug = make_slug(data['url'])
 
-    class Meta:
-        model = Repository
+            real_slug = find_unused_slug(slug)
+            if data['slug'] != real_slug:
+                data['original_slug'] = data['slug']
+                data['slug'] = real_slug
 
-class PublicRepositoryForm(_BaseForm):
-    class Meta:
-        model = Repository
-        fields = ('url', 'slug')
+            repository = Repository(**data)
 
-if VCS_ONLY_PUBLIC_REPS:
-    RepositoryForm = PublicRepositoryForm
-else:
-    RepositoryForm = PrivateRepositoryForm
+        return repository.save()
 

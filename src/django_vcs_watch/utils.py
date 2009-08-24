@@ -17,12 +17,18 @@ def strip_get(url):
 
 # slugificator
 
-def make_slugs(url):
-    "Returns list of available slugs for given URL."
+def make_slug(url, path_filter = lambda x: x not in ['', 'svn']):
+    "Returns a slug for given URL."
     from urlparse import urlparse
     host, path = urlparse(url)[1:3]
-    host = [host.split('.')[-2]]
-    path = filter(lambda x:x, path.replace('.', '-').split('/'))
+    host = host.split('.')
+
+    result = []
+
+    if host[-2] == 'googlecode':
+        result.append(host[-3])
+
+    path = filter(path_filter, path.replace('.', '-').split('/'))
 
     def index(l, value):
         try: return l.index(value)
@@ -36,14 +42,12 @@ def make_slugs(url):
 
     if ttb_index:
         path.pop(ttb_index[0])
-    base = path
+    result += path
 
-    result = [
-        path,
-        host + path
-    ]
+    if len(result) == 0:
+        result.append(host[-2])
 
-    return ['-'.join(slug) for slug in result if slug]
+    return '-'.join(result)
 
 
 def strip_timezone(t):
@@ -70,4 +74,63 @@ def guess_encoding(s):
         except DjangoUnicodeDecodeError:
             pass
     raise Exception('Can\'t decode string: %r' % s)
+
+def mongo():
+    from pymongo.connection import Connection
+    from django_vcs_watch.settings import \
+        MONGO_URL, \
+        MONGO_DB
+
+    conn = Connection(MONGO_URL)
+    return conn[MONGO_DB]
+
+
+
+class DiffProcessor(object):
+    """Helper to parse diffs, separate by file and collect some information."""
+
+    def _start_new_file(self, filename):
+        if self.current is not None:
+            self.current['diff'] = '\n'.join(self.current['diff'])
+            self.changed.append(self.current)
+
+        self.current = dict(
+            filename = filename,
+            diff = [],
+            stats = dict(added = 0, removed = 0)
+        )
+
+
+    def process(self, diff):
+        """Parses diff and returns dict with statistics and separate diffs for each changed file."""
+        self.changed = []
+        self.current = None
+        self.added = 0
+        self.removed = 0
+
+        for line in diff.split('\n'):
+            if line.startswith('Index: '):
+                self._start_new_file(line.split(' ', 1)[1])
+                continue
+            elif line[:3] in ('===', '---', '+++'):
+                continue
+            elif line.startswith('+'):
+                self.added += 1
+                self.current['stats']['added'] += 1
+            elif line.startswith('-'):
+                self.removed -= 1
+                self.current['stats']['removed'] -= 1
+
+            if self.current is not None:
+                self.current['diff'].append(line)
+
+        self._start_new_file(None)
+
+        return dict(
+                changed = self.changed,
+                stats = dict(
+                        added = self.added,
+                        removed = self.removed
+                    )
+            )
 
