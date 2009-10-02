@@ -81,9 +81,9 @@ class Repository(Document):
         return ('vcs-watch-feed-commits', (), {'param': self.slug })
 
 
-    def updateFeed(self):
-        log = logging.getLogger('django_vcs_watch.repository.updateFeed')
-        log.debug('update %s' % self.slug)
+    def update(self):
+        log = logging.getLogger('django_vcs_watch.repository.update')
+        log.debug('updating %s' % self.slug)
 
         from django_vcs_watch.backends.svn import get_updates
 
@@ -91,7 +91,7 @@ class Repository(Document):
             commits = get_updates(self.url, self.last_rev,
                                   self.username, self.password)
         except Exception, e:
-            log.exception('error during commits fetching')
+            log.exception('error during repository update')
             self.last_error = str(e).decode('utf-8')
 
             if self.last_error_date:
@@ -183,6 +183,51 @@ class Repository(Document):
 class Feed(Document):
     collection = 'feeds'
 
+    def init(self, slug = None, ignore = []):
+        self.slug = slug
+        self.ignore = ignore
+        self.num_items = 0
+        super(Feed, self).__init__(slug, ignore)
+
+
+    def update(self):
+        log = logging.getLogger('django_vcs_watch.feed.update')
+        log.debug('updating %s' % self.slug)
+
+        if self.ignore is None:
+            self.ignore = []
+
+        if self.num_items is None:
+            self.num_items = 0
+
+        query = ' || '.join(
+            ' && '.join(
+                "this.%s == '%s'" % item for item in rule.items())
+                for rule in self.ignore)
+
+        if query:
+            query = {'$where': '!(%s)' % query}
+        else:
+            query = {}
+
+        last_item = FeedItem.objects.find_one(dict(slug = self.slug))
+
+        if last_item is not None:
+            query['date'] = {'$gt': last_item.date}
+
+
+        for commit in Commit.objects.find(query):
+            FeedItem(slug = self.slug, date = commit.date, commit = commit).save()
+            self.num_items += 1
+
+        self.save()
+
+
+    def full_update(self):
+        """ Drop all items and fill the feed with filtered items from scratch. """
+        FeedItem.objects.remove(dict(slug = self.slug))
+        self.update()
+
 
 
 class FeedItem(Document):
@@ -214,15 +259,5 @@ def create_feed(slug = 'test-feed'):
         feed.save()
         print 'Feed %s created' % slug
 
-    query = ' || '.join(
-        ' && '.join(
-            "this.%s == '%s'" % item for item in rule.items())
-            for rule in feed.ignore)
-
-    if query:
-        query = '!(%s)' % query
-
-    FeedItem.objects.remove()
-    for commit in Commit.objects.find({'$where': query}):
-        FeedItem(slug = slug, date = commit.date, commit = commit).save()
+    feed.update()
 

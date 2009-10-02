@@ -82,6 +82,10 @@ urlpatterns = patterns('django_vcs_watch.views',
         'object_detail', repository_detail, 'vcs-watch-repository'),
    (r'^f/(?P<slug>[a-z0-9-]+)/$',
         'object_list', feed_items, 'vcs-watch-feed'),
+   (r'^refresh-feed/$',
+        'refresh_feed', {}, 'vcs-watch-refresh-feed'),
+   (r'^ignore/$', 'ignore', {}, 'vcs-watch-ignore'),
+   (r'^unignore/$', 'unignore', {}, 'vcs-watch-unignore'),
 )
 
 urlpatterns += patterns('django.views.generic',

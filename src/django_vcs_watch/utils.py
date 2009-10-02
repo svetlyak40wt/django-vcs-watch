@@ -1,6 +1,8 @@
 import re
+import md5
 from datetime import datetime
 
+from django.conf import settings
 from django.utils.encoding import DjangoUnicodeDecodeError, force_unicode
 
 # URL rewriters
@@ -84,6 +86,11 @@ def mongo():
     conn = Connection(MONGO_URL)
     return conn[MONGO_DB]
 
+
+def get_user_feed_slug(user):
+    if user.is_anonymous():
+        raise Exception("Anonymous user can't have a feed.")
+    return md5.md5(user.username + settings.SECRET_KEY).hexdigest()
 
 
 class DiffProcessor(object):
