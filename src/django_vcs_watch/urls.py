@@ -86,6 +86,8 @@ urlpatterns = patterns('django_vcs_watch.views',
         'refresh_feed', {}, 'vcs-watch-refresh-feed'),
    (r'^ignore/$', 'ignore', {}, 'vcs-watch-ignore'),
    (r'^unignore/$', 'unignore', {}, 'vcs-watch-unignore'),
+   (r'^watch/$', 'watch', {}, 'vcs-watch-watch'),
+   (r'^unwatch/$', 'unwatch', {}, 'vcs-watch-ununwatch'),
 )
 
 urlpatterns += patterns('django.views.generic',

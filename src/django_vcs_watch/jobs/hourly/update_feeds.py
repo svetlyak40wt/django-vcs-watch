@@ -66,9 +66,9 @@ class Job(HourlyJob):
         feeds = Feed.objects.find()
 
         for feed in feeds:
-            log.debug('feed to update: %s' % feed.slug)
+            log.debug('feed to update: %s' % feed._id)
             try:
                 feed.update()
             except Exception, e:
-                log.exception("can't update feed %s" % feed.slug)
+                log.exception("can't update feed %s" % feed._id)
 

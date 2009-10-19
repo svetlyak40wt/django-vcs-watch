@@ -23,7 +23,8 @@ from django_vcs_watch.settings import \
 from django_vcs_watch.utils import \
     timedelta_to_string, \
     strip_timezone, \
-    mongo
+    mongo, \
+    get_user_feed_slug
 
 from pymongo import DESCENDING
 from mongobongo import Document
@@ -183,41 +184,59 @@ class Repository(Document):
 class Feed(Document):
     collection = 'feeds'
 
-    def init(self, slug = None, ignore = []):
-        self.slug = slug
+    def init(self, _id = None, ignore = [], watch = []):
+        self._id = _id
         self.ignore = ignore
+        self.watch = watch
         self.num_items = 0
-        super(Feed, self).__init__(slug, ignore)
+        super(Feed, self).__init__(slug)
 
 
     def update(self):
         log = logging.getLogger('django_vcs_watch.feed.update')
-        log.debug('updating %s' % self.slug)
+        log.debug('updating %s' % self._id)
 
         if self.ignore is None:
             self.ignore = []
 
+        if self.watch is None:
+            self.watch = []
+
         if self.num_items is None:
             self.num_items = 0
 
-        query = ' || '.join(
+        watch_query = ' || '.join(
+            ' && '.join(
+                "this.%s == '%s'" % item for item in rule.items())
+                for rule in self.watch)
+
+        ignore_query = ' || '.join(
             ' && '.join(
                 "this.%s == '%s'" % item for item in rule.items())
                 for rule in self.ignore)
 
-        if query:
-            query = {'$where': '!(%s)' % query}
-        else:
-            query = {}
+        if not watch_query:
+            return
 
-        last_item = FeedItem.objects.find_one(dict(slug = self.slug))
+        query = {'$where': '(%s) && !(%s)' % (watch_query, ignore_query or '0')}
+
+        last_item = FeedItem.objects.find_one(dict(slug = self._id))
 
         if last_item is not None:
             query['date'] = {'$gt': last_item.date}
 
+        Commit.objects.ensure_index([('slug', 1)])
+        Commit.objects.ensure_index([('author', 1)])
+
+        from pymongo.dbref import DBRef
 
         for commit in Commit.objects.find(query):
-            FeedItem(slug = self.slug, date = commit.date, commit = commit).save()
+            commit_ref = DBRef(commit.objects.collection_name, commit._id)
+            if FeedItem.objects.find_one(
+                    dict(slug = self._id, commit = commit_ref)) is not None:
+                logging.error('UPS I DID IT AGAIN!')
+
+            FeedItem(slug = self._id, date = commit.date, commit = commit).save()
             self.num_items += 1
 
         self.save()
@@ -225,7 +244,7 @@ class Feed(Document):
 
     def full_update(self):
         """ Drop all items and fill the feed with filtered items from scratch. """
-        FeedItem.objects.remove(dict(slug = self.slug))
+        FeedItem.objects.remove(dict(slug = self._id))
         self.update()
 
 
@@ -245,19 +264,19 @@ from django.db.models.signals import class_prepared
 class_prepared.connect(_init_mongo_connection)
 
 
-def create_feed(slug = 'test-feed'):
-    feed = Feed.objects.find_one({'slug': slug})
+def create_user_feed(instance, **kwargs):
+    feed_id = get_user_feed_slug(instance)
+
+    feed = Feed.objects.find_one(dict(_id = feed_id))
+
     if feed is None:
         feed = Feed(
-            slug = slug,
-            ignore = [
-                dict(slug = 'django', author = 'russellm'),
-                dict(slug = 'stuff', author = 'depot-robot'),
-                dict(slug = 'maps', author = 'aapetrov'),
-            ]
+            _id = feed_id,
+            user_id = instance.id
         )
         feed.save()
-        print 'Feed %s created' % slug
 
-    feed.update()
 
+from django.db.models import signals
+
+signals.post_save.connect(create_user_feed, sender = User)

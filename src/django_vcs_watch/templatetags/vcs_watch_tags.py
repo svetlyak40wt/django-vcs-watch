@@ -179,7 +179,7 @@ def get_user_feed(parser, token):
         cls = Feed,
         vars = vars,
         query = lambda context, vars: dict(
-            slug = get_user_feed_slug(context['request'].user),
+            _id = get_user_feed_slug(context['request'].user),
         ),
     )
 

@@ -266,12 +266,7 @@ def commit(request, repository_slug, revision):
 def get_user_feed(request):
     user = request.user
     feed_slug = get_user_feed_slug(user)
-
-    feed = Feed.objects.find_one({'slug': feed_slug})
-    if feed is None:
-        feed = Feed(slug = feed_slug)
-        feed.save()
-    return feed
+    return Feed.objects.find_one(dict(_id = feed_slug))
 
 
 def refresh_feed(request, template_name = 'django_vcs_watch/refresh_feed.html'):
@@ -337,6 +332,59 @@ def unignore(request):
         feed.ignore = filter(lambda x: x != rule, feed.ignore)
     else:
         feed.ignore = []
+
+    feed.save()
+
+    if rule:
+        request.user.message_set.create(message = _('Rule was removed.'))
+    else:
+        request.user.message_set.create(message = _('All rules were removed.'))
+
+    next = request.POST.get('next', '/')
+    return HttpResponseRedirect(next)
+
+
+@require_POST
+def watch(request):
+    feed = get_user_feed(request)
+
+    if feed.watch is None:
+        feed.watch = []
+
+    rule = get_rule(request)
+
+    feed.watch.append(rule)
+    feed.save()
+
+    if 'slug' in rule:
+        message = _('<div class="info">Now you watch on all commits to %(slug)s. Horay!</div>')
+    elif 'author' in rule:
+        message = _('<div class="info">Now you watch on all commits by %(author)s. Yee!</div>')
+    else:
+        message = _('<div class="error">Hm, it seems that we have no message for this case :).</div>')
+
+    request.user.message_set.create(message = message % rule)
+
+    next = request.POST.get('next', None)
+    if not next:
+        next = request.META.get('HTTP_REFERER', '/')
+
+    return HttpResponseRedirect(next)
+
+
+@require_POST
+def unwatch(request):
+    feed = get_user_feed(request)
+
+    if feed.watch is None:
+        feed.watch = []
+
+    rule = get_rule(request)
+
+    if rule:
+        feed.watch = filter(lambda x: x != rule, feed.watch)
+    else:
+        feed.watch = []
 
     feed.save()
 
