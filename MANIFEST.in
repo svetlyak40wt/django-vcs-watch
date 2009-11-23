@@ -1,3 +1,4 @@
 recursive-include src/*/templates *.html
+recursive-include src/*/locale *
 include LICENSE
 include README.md
