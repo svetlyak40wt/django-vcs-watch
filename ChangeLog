@@ -1,6 +1,18 @@
 Changes in django-vcs-watch
 ===========================
 
+0.2.3
+-----
+
+* Added option VCS_POSTPROCESS_COMMIT, which is a hook to manipulate with a
+commit after it was fetched from a repository, but before it is saved to the
+database.
+
+0.2.2
+-----
+
+* Translation fix. Now locale is in the python package.
+
 0.2.1
 -----
 

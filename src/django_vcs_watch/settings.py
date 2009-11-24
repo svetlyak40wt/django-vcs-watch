@@ -1,4 +1,5 @@
 from django.conf import settings
+from django_vcs_watch import utils
 
 __all__ = [
     'VCS_ONLY_PUBLIC_REPS',
@@ -9,6 +10,7 @@ __all__ = [
     'DELAY_BETWEEN_UPDATE_CHECK',
     'MONGO_URL',
     'MONGO_DB',
+    'POSTPROCESS_COMMIT',
 ]
 
 VCS_ONLY_PUBLIC_REPS = getattr(settings, 'VCS_ONLY_PUBLIC_REPS', False)
@@ -23,4 +25,9 @@ DELAY_BETWEEN_UPDATE_CHECK = getattr(settings, 'VCS_DELAY_BETWEEN_UPDATE_CHECK',
 
 MONGO_URL = getattr(settings, 'MONGO_URL', 'localhost')
 MONGO_DB = getattr(settings, 'MONGO_DB', 'vcs-watch')
+
+def postprocess_commit(repository, commit):
+    utils.extract_filetypes(repository, commit)
+
+POSTPROCESS_COMMIT = getattr(settings, 'VCS_POSTPROCESS_COMMIT', postprocess_commit)
 

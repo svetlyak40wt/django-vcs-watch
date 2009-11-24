@@ -18,7 +18,8 @@ from django_fields.fields import EncryptedCharField
 from django_vcs_watch.settings import \
     REVISION_LIMIT, \
     CHECK_INTERVAL_MIN, \
-    CHECK_INTERVAL_MAX
+    CHECK_INTERVAL_MAX, \
+    POSTPROCESS_COMMIT
 
 from django_vcs_watch.utils import \
     timedelta_to_string, \
@@ -119,6 +120,8 @@ class Repository(Document):
                 continue
 
             commit.slug = self.slug
+
+            POSTPROCESS_COMMIT(self, commit)
 
             try:
                 commit.save()

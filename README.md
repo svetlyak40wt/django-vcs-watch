@@ -50,12 +50,17 @@ These options can be added to your settings.py:
 * `VCS_WATCH_PID_DIR` -- Directory, where to story pid file for jobs.
   **Default value is '/tmp'.**
 
-* `VCS_ONLY_PUBLIC_REPS` -- Set to True if you want only public repositories online.
+* `VCS_POSTPROCESS_COMMIT` -- This is a hook to manipulate with the commit after it
+was fetched from a repository, but before it is saved to the database. It should be a
+callable with two arguments - Repository object and Commit object. By default it extracts
+filetypes and saves them as commit tags with 'ft:' prefix.
 
 TODO
 ====
 
 * Write a short *Installation* instruction.
+* Update this readme and describe more options.
 * Add check for valid and accessible URL before add it to database.
 * Add ability to edit or remove Repository.
+* Check if similar URL already exists.
 

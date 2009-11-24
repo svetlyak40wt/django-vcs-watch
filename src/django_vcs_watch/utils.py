@@ -141,3 +141,14 @@ class DiffProcessor(object):
                     )
             )
 
+
+def extract_filetypes(repository, commit):
+    tags = set(commit.tags or [])
+
+    for ch in commit.changes.changed:
+        splitted = ch.filename.rsplit('.', 1)
+        if len(splitted) > 1 and len(splitted[-1]) <= 4:
+            tags.add('ft:' + splitted[-1].lower())
+
+    commit.tags = list(tags)
+
