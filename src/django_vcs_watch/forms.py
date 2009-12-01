@@ -47,7 +47,8 @@ class RepositoryForm(forms.Form):
         if repository:
             if not data['slug']:
                 del data['slug']
-            repository.update(data)
+            for key, value in data.iteritems():
+                setattr(repository, key, value)
         else:
             slug = data['slug']
             if not slug:
