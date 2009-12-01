@@ -51,6 +51,9 @@ class Commit(Document):
     def __unicode__(self):
         return _('Commit %(revision)s by %(author)s') % self.__dict__
 
+    def __repr__(self):
+        return self.__unicode__()
+
     @models.permalink
     def get_absolute_url(self):
         return ('vcs-watch-commit', (), {'repository_slug': self.slug, 'revision': self.revision})
@@ -71,6 +74,9 @@ class Repository(Document):
 
     def __unicode__(self):
         return _('Repository at %s') % self.url
+
+    def __repr__(self):
+        return self.__unicode__()
 
 
     @models.permalink
@@ -187,6 +193,12 @@ class Repository(Document):
 class Feed(Document):
     collection = 'feeds'
 
+    def __unicode__(self):
+        return _('Feed %s') % self._id
+
+    def __repr__(self):
+        return self.__unicode__()
+
     def init(self, _id = None, ignore = [], watch = []):
         self._id = _id
         self.ignore = ignore
@@ -254,6 +266,12 @@ class Feed(Document):
 
 class FeedItem(Document):
     collection = 'feed_items'
+
+    def __unicode__(self):
+        return _('FeedItem %s') % self._id
+
+    def __repr__(self):
+        return self.__unicode__()
 
     class Meta:
         ordering = [('date', DESCENDING)]
