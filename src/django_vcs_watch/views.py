@@ -282,7 +282,7 @@ def refresh_feed(request, template_name = 'django_vcs_watch/refresh_feed.html'):
         dict(feed = feed),
     )
 
-def get_rule(request):
+def get_rule_from_request(request):
     rule_fields = ('author', 'slug')
 
     return dict(filter(
@@ -297,7 +297,7 @@ def ignore(request):
     if feed.ignore is None:
         feed.ignore = []
 
-    rule = get_rule(request)
+    rule = get_rule_from_request(request)
 
     feed.ignore.append(rule)
     feed.save()
@@ -326,7 +326,7 @@ def unignore(request):
     if feed.ignore is None:
         feed.ignore = []
 
-    rule = get_rule(request)
+    rule = get_rule_from_request(request)
 
     if rule:
         feed.ignore = filter(lambda x: x != rule, feed.ignore)
@@ -351,7 +351,7 @@ def watch(request):
     if feed.watch is None:
         feed.watch = []
 
-    rule = get_rule(request)
+    rule = get_rule_from_request(request)
 
     feed.watch.append(rule)
     feed.save()
@@ -379,7 +379,7 @@ def unwatch(request):
     if feed.watch is None:
         feed.watch = []
 
-    rule = get_rule(request)
+    rule = get_rule_from_request(request)
 
     if rule:
         feed.watch = filter(lambda x: x != rule, feed.watch)
@@ -395,4 +395,29 @@ def unwatch(request):
 
     next = request.POST.get('next', '/')
     return HttpResponseRedirect(next)
+
+
+def filter(request):
+    q = request.GET.get('q', '')
+
+    def create_rule_item(s):
+        """ Returns pair (name, value) for strings like '$django', '@art' or '#ft:py'"""
+        names = {'$': 'slug', '@': 'author', '#': 'tag'}
+        return (names[s[0]], s[1:])
+
+    q = map(create_rule_item, q.split())
+
+    if q:
+        q = {'$where': ' && '.join("this.%s == '%s'" % item for item in q)}
+    else:
+        q = {}
+
+    return object_list(
+            request,
+            cls = Commit,
+            query = q,
+            template_name = 'django_vcs_watch/filtered_commits.html',
+            template_object_name = 'commits_list',
+            paginate_by = 20,
+        )
 
