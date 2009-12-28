@@ -1,3 +1,5 @@
+import copy
+import itertools
 import re
 import pymongo
 
@@ -21,6 +23,12 @@ _WRAPPERS = defaultdict(lambda: lambda x:x, {
     'repositories': Repository,
     'commits': Commit,
 })
+
+
+def uniq(lst):
+    _copy = copy.copy(lst)
+    _copy.sort()
+    return [i[0] for i in itertools.groupby(_copy)]
 
 
 @login_required
@@ -283,12 +291,19 @@ def refresh_feed(request, template_name = 'django_vcs_watch/refresh_feed.html'):
     )
 
 def get_rule_from_request(request):
-    rule_fields = ('author', 'slug')
+    tokens = request.POST.get('rule', '').split('&&')
+    tokens = (t.strip() for t in tokens)
+    tokens = (t for t in tokens if t)
 
-    return dict(filter(
-        lambda x: x[0] in rule_fields,
-        request.POST.items()
-    ))
+    rule = {}
+    for token in tokens:
+        if token[0] == '@':
+            rule['author'] = token[1:]
+        elif token[0] == '$':
+            rule['slug'] = token[1:]
+
+    return rule
+
 
 @require_POST
 def ignore(request):
@@ -300,6 +315,7 @@ def ignore(request):
     rule = get_rule_from_request(request)
 
     feed.ignore.append(rule)
+    feed.ignore = uniq(feed.ignore)
     feed.save()
 
     if 'author' in rule:
@@ -354,6 +370,7 @@ def watch(request):
     rule = get_rule_from_request(request)
 
     feed.watch.append(rule)
+    feed.watch = uniq(feed.watch)
     feed.save()
 
     if 'slug' in rule:
